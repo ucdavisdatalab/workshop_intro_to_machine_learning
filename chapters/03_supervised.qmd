@@ -1,0 +1,21 @@
+# Supervised Learning
+
+Classification refers to modeling categorical variables. Classification models
+can provide insight into the relationship between the predictors and response,
+as well as a way to make predictions about new observations.
+
+This chapter provides an overview of popular classification models, and then
+delves into the details of actually using them. We'll cover how to choose a
+model, how to partition data into training and test sets, how to use
+cross-validation to tune model hyperparameters, and how to evaluate the
+performance of models in R. We'll also explain some strategies you can use to
+improve model performance.
+
+::: {.callout-note title="Learning Goals"}
+After this workshop, learners should be able to:
+
+* Build and train a classification model on their data.
+* Use cross-validation to estimate accuracy and tune hyperparameters for
+  classification models.
+* Identify strategies to improve results from classification models.
+:::

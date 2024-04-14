@@ -1,0 +1,27 @@
+project:
+  type: book
+
+book:
+  title: "Introduction to Machine Learning"
+  author: "Nick Ulle"
+  date: "4/14/2024"
+  sidebar:
+    logo: https://datalab.ucdavis.edu/wp-content/uploads/2019/07/datalab-logo-full-color-rgb-1.png
+    logo-href: https://datalab.ucdavis.edu/
+  chapters:
+    - index.qmd
+    - chapters/01_introduction.qmd
+    - chapters/02_unsupervised.qmd
+    - chapters/03_supervised.qmd
+    - chapters/references.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+
+
+
