@@ -1,0 +1,93 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Introduction to Machine Learning",
+    "section": "",
+    "text": "Overview\nThis is a Quarto book.\nTo learn more about Quarto books visit https://quarto.org/docs/books.",
+    "crumbs": [
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "intro.html",
+    "href": "intro.html",
+    "title": "1  Introduction",
+    "section": "",
+    "text": "This is a book created from markdown and executable code.\nSee Knuth (1984) for additional discussion of literate programming.\n\n\n\n\nKnuth, Donald E. 1984. “Literate Programming.” Comput. J. 27 (2): 97–111. https://doi.org/10.1093/comjnl/27.2.97."
+  },
+  {
+    "objectID": "summary.html",
+    "href": "summary.html",
+    "title": "2  Summary",
+    "section": "",
+    "text": "In summary, this book has no content whatsoever."
+  },
+  {
+    "objectID": "references.html",
+    "href": "references.html",
+    "title": "References",
+    "section": "",
+    "text": "Knuth, Donald E. 1984. “Literate Programming.” Comput.\nJ. 27 (2): 97–111. https://doi.org/10.1093/comjnl/27.2.97."
+  },
+  {
+    "objectID": "chapters/intro.html",
+    "href": "chapters/intro.html",
+    "title": "1  Introduction",
+    "section": "",
+    "text": "This is a book created from markdown and executable code.\nSee Knuth (1984) for additional discussion of literate programming.\n\n\n\n\nKnuth, Donald E. 1984. “Literate Programming.” Comput. J. 27 (2): 97–111. https://doi.org/10.1093/comjnl/27.2.97.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Introduction</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/summary.html",
+    "href": "chapters/summary.html",
+    "title": "2  Summary",
+    "section": "",
+    "text": "In summary, this book has no content whatsoever.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Summary</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/references.html",
+    "href": "chapters/references.html",
+    "title": "References",
+    "section": "",
+    "text": "Knuth, Donald E. 1984. “Literate Programming.” Comput.\nJ. 27 (2): 97–111. https://doi.org/10.1093/comjnl/27.2.97.",
+    "crumbs": [
+      "References"
+    ]
+  },
+  {
+    "objectID": "chapters/01_introduction.html",
+    "href": "chapters/01_introduction.html",
+    "title": "1  Introduction",
+    "section": "",
+    "text": "1.1 What Is Machine Learning?",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Introduction</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/02_unsupervised.html",
+    "href": "chapters/02_unsupervised.html",
+    "title": "2  Unsupervised Learning",
+    "section": "",
+    "text": "Clustering involves identifying groups of similar observations (called clusters) within data. Clustering can be an effective tool for finding patterns and an important part of exploratory data analysis.\nThis chapter presents the advantages and disadvantages of several popular algorithms for clustering, as well as examples of how to run clustering algorithms in R.\n\n\n\n\n\n\nLearning Goals\n\n\n\nAfter this workshop, learners should be able to:\n\nExplain the tradeoffs between popular clustering algorithms.\nRun a clustering algorithm on their data.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Unsupervised Learning</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/03_supervised.html",
+    "href": "chapters/03_supervised.html",
+    "title": "3  Supervised Learning",
+    "section": "",
+    "text": "Classification refers to modeling categorical variables. Classification models can provide insight into the relationship between the predictors and response, as well as a way to make predictions about new observations.\nThis chapter provides an overview of popular classification models, and then delves into the details of actually using them. We’ll cover how to choose a model, how to partition data into training and test sets, how to use cross-validation to tune model hyperparameters, and how to evaluate the performance of models in R. We’ll also explain some strategies you can use to improve model performance.\n\n\n\n\n\n\nLearning Goals\n\n\n\nAfter this workshop, learners should be able to:\n\nBuild and train a classification model on their data.\nUse cross-validation to estimate accuracy and tune hyperparameters for classification models.\nIdentify strategies to improve results from classification models.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Supervised Learning</span>"
+    ]
+  }
+]
