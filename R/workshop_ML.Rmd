@@ -1,0 +1,294 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = '/Users/jalenlee/workshop')
+```
+
+
+```{r}
+library(dplyr)
+source("R/clean_eada.R")
+main()
+```
+
+
+```{r}
+main = function(
+  path = "data/equity_in_athletics/2003-2022_equity-in-athletics.csv"
+) {
+  eada = read_csv(path)
+  #names(eada) = 
+  #  str_fix_names(names(eada))
+  names = names(eada)
+  sports = extract_sports(names)
+  pattern = str_glue("^({str_flatten(sports, '|')})")
+  names[!str_detect(names, pattern)]
+  return(eada)
+}
+
+df = main()
+df
+col_names = names(df)
+
+recruiting = df[str_detect(names(df), "Recruiting")]
+recruiting[is.na(recruiting)] = 0
+`Total Recruiting Expenses` = rowSums(recruiting)
+df = cbind(df, `Total Recruiting Expenses`)
+
+df
+```
+
+```{r}
+#team expense, team participation, operating expense, team revenue
+sport = extract_sports(col_names)
+
+sport
+```
+
+```{r}
+find_subsets = function(list1, list2) {
+  result = c()
+  for (item1 in list1) {
+    for (item2 in list2) {
+      if (str_detect(item2, fixed(item1))) {
+        result = c(result, item2)
+      }
+    }
+  }
+  unique(result)
+}
+
+sports_col = find_subsets(sport, col_names)
+
+base_col = setdiff(col_names, sports_col)
+
+#pivot everything that isn't base_col
+
+base_df = df[base_col]
+
+base_df
+
+sports_df = df[sports_col]
+
+sports_col
+
+names(base_df)
+```
+### take out participation
+
+
+```{r}
+dnp = sports_df[!str_detect(names(sports_df), "Participation")]
+participation = sports_df[str_detect(names(sports_df), "Participation")]
+Coeds_participation = participation[str_detect(names(participation), "Coed")]
+
+Coeds = dnp[str_detect(names(dnp), "Coed")]
+
+sport
+
+names(Coeds) #replace this with mens_list and womens_list
+
+Coeds
+
+
+mens_list = gsub("Coed Team", "Coed Men Team", names(Coeds))
+mens_df = Coeds
+colnames(mens_df) = mens_list
+womens_list = gsub("Coed Team", "Coed Women Team", names(Coeds))
+womens_df = Coeds
+colnames(womens_df) = womens_list
+
+
+New_Coeds = cbind(Coeds_participation, mens_df, womens_df)
+
+
+names(New_Coeds)
+
+No_coed = setdiff(names(df), names(Coeds))
+
+final_df = cbind(df[No_coed], New_Coeds)
+
+final_df
+
+names(final_df)
+
+final_df
+```
+
+```{r}
+pivots = find_subsets(sport, names(final_df)) #subset these and pivot 4x
+
+
+
+
+participation = pivots[str_detect(pivots, "Participation")] #participation
+
+
+
+pivots[str_detect(names(pivots), "Operating Expenses")]
+pivots[str_detect(names(pivots), "Team Expenses")]
+pivots[str_detect(names(pivots), "Revenue")]
+
+
+```
+
+
+```{r}
+final_df %>% pivot_longer(cols = participation,
+                    names_to='sport participation',
+                    values_to='participation')
+
+```
+
+
+
+```{r}
+partition = (split(total,ceiling(seq_along(total) / 4)))
+
+total
+
+
+schools = nrow(df[partition[[1]]])
+
+Sport_name = rep(sport[1], schools)
+archery = cbind(sport_name, df[partition[[1]]])
+
+temp = cbind(base_df, archery)
+
+names(temp)[ncol(temp)]
+
+names(temp)[ncol(temp)]
+
+temp[!is.na(temp$`Archery Total Expenses`),]
+
+```
+
+```{r}
+sports_col
+sport_teams
+
+
+```
+
+
+```{r}
+Coed = sport_teams[(str_detect(sport_teams, fixed('Coed')))]
+Coed
+
+
+Coed_partition = (split(Coed,ceiling(seq_along(Coed) / 5)))
+
+
+coed_archery = df[Coed_partition[[1]]]
+
+
+coed_archery[!is.na(coed_archery$`Archery Coed Team Expenses`),]
+
+```
+
+```{r}
+sport[1]
+
+team_general = sport_teams[(str_detect(sport_teams, sport[3]))]
+
+team_general = df[team_general]
+
+str_detect(names(team_general), 'Total Participation')
+
+Participation = names(team_general)[5]
+
+cleaned_team = team_general[!is.na(team_general[[Participation]]),]
+
+Coed_team_expense = names(team_general)[16]
+
+cleaned_team[!is.na(cleaned_team[[Coed_team_expense]]),]
+
+
+names(cleaned_team)
+
+cleaned_team[str_detect(names(cleaned_team), 'Total')]
+
+cleaned_totals = names(cleaned_team)[str_detect(names(cleaned_team), 'Total')] 
+
+
+total_diff
+
+keywords = c("Men", "Women", "Coed", "Total")
+
+sports_col = names(cleaned_team)
+
+not_participation = sports_col[!str_detect(sports_col, "Participation")]
+participation = sports_col[str_detect(sports_col, "Participation")]
+
+
+for (keyword in keywords){
+  keywording = not_participation[str_detect(not_participation, keyword)] 
+  #strip the string and check the word in front of team combine this list with each item of participation
+  print(keywording)
+}
+#for coed women and coed men make coed repeat for both
+
+keywording
+
+#use pivot dplyr to make wider to long
+
+#duplicate coed cols except participation
+#in participation, revenue, operating expenses, team expenses
+```
+
+
+```{r}
+participation
+df
+```
+
+
+
+
+```{r}
+dnp = df[!str_detect(names(df), "Participation")]
+
+Coeds = dnp[str_detect(names(dnp), "Coed")]
+
+setdiff(names(Coeds), sport)
+
+sport
+
+coed_cols = find_subsets(sport, names(Coeds))
+
+head(names(Coeds), -9)
+
+find_subsets(coed_cols, tail(names(Coeds), -9))
+
+```
+
+```{r}
+coed_cols
+
+tail(names(Coeds), -9)
+
+
+tail(names(Coeds), -9)[!(tail(names(Coeds), -9) %in% coed_cols)] #the difference between the two
+
+df[str_detect(names(df), "Recruiting")] #sum these up for total recruiting expenses
+
+names(df[str_detect(names(df), "Recruiting")])
+
+######################
+#recruiting
+
+recruiting = df[str_detect(names(df), "Recruiting")]
+
+`Total Recruiting Expenses` = rowSums(recruiting)
+
+recruiting[is.na(recruiting)] = 0
+
+recruiting = cbind(df, `Total Recruiting Expenses`)
+```
+
+
+
