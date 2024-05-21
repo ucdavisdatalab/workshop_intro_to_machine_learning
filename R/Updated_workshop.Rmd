@@ -1,0 +1,96 @@
+---
+title: "Recovery"
+author: "Jalen"
+date: "2024-05-20"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = '/Users/jalenlee/workshop')
+```
+
+
+```{r}
+library(dplyr)
+library(tidyverse)
+source("R/clean_eada.R")
+df = main()
+```
+
+#col cleaning and creation for inconsistencies 
+
+
+```{r}
+col_names = names(df)
+sport = extract_sports(col_names)
+
+recruiting = df[str_detect(names(df), "Recruiting")]
+recruiting[is.na(recruiting)] = 0
+`Total Recruiting Expenses` = rowSums(recruiting)
+df = cbind(df, `Total Recruiting Expenses`)
+
+names(df)[names(df) ==
+            "Beach Volleyball Coed Team Operating Expenses Operating Expenses"] =" Beach Volleyball Coed Team Operating Expenses"
+
+names(df)[names(df) == "Beach Volleyball Coed Team Revenue Revenue"] = "Beach Volleyball Coed Team Revenue"
+names(df)[names(df) == "Beach Volleyball Coed Team Expenses Expenses"] = "Beach Volleyball Coed Team Expenses"
+
+#These two names are just inherently wrong
+#Beach Volleyball Coed Team Operating Expenses Operating Expenses
+#Beach Volleyball Coed Team Revenue Revenue
+
+
+```
+
+```{r}
+col_names = names(df)
+
+sports_col = find_subsets(sport, col_names)
+base_col = setdiff(col_names, sports_col)
+
+base_df = df[base_col]
+
+sports_df = df[sports_col]
+
+sports_df
+```
+
+
+### take out participation
+
+```{r}
+dnp = sports_df[!str_detect(names(sports_df), "Participation")]
+
+Coeds = dnp[str_detect(names(dnp), "Coed")]
+
+names(Coeds) #replace this with mens_list and womens_list
+
+Coeds #this has coed team revenue, coed team operating expenses, and team expenses
+
+mens_list = gsub("Coed Team", "Coed Men Team", names(Coeds))
+mens_df = Coeds
+colnames(mens_df) = mens_list
+womens_list = gsub("Coed Team", "Coed Women Team", names(Coeds))
+womens_df = Coeds
+colnames(womens_df) = womens_list
+
+New_Coeds = cbind(mens_df, womens_df)
+
+No_coed = setdiff(names(df), names(Coeds))
+
+#No_coed = setdiff(names(df), names(New_Coeds))
+
+df[No_coed][str_detect(colnames(df[No_coed]), "Coed")]
+
+final_df = cbind(df[No_coed], New_Coeds)
+```
+
+
+# Final df with all sports pivoted
+
+```{r}
+result_df = lapply(sport, function(sport_team) pivot_df(df, sport_team))
+combined_df = do.call(rbind, result_df)
+
+```
+
