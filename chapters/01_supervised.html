@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.553">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Introduction to Machine Learning - 1&nbsp; Supervised Learning</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/02_unsupervised.html" rel="next">
+<link href="../index.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/01_supervised.html"><strong>Machine Learning in R</strong></a></li><li class="breadcrumb-item"><a href="../chapters/01_supervised.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Supervised Learning</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="../index.html" class="sidebar-logo-link">
+      <img src="https://datalab.ucdavis.edu/wp-content/uploads/2019/07/datalab-logo-full-color-rgb-1.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Introduction to Machine Learning</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text"><strong>Machine Learning in R</strong></span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01_supervised.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Supervised Learning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02_unsupervised.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Unsupervised Learning</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1.1</span> Introduction</a></li>
+  <li><a href="#packages" id="toc-packages" class="nav-link" data-scroll-target="#packages"><span class="header-section-number">1.2</span> Packages</a>
+  <ul class="collapse">
+  <li><a href="#sec-penguins" id="toc-sec-penguins" class="nav-link" data-scroll-target="#sec-penguins"><span class="header-section-number">1.2.1</span> Example: Classifying Penguins</a></li>
+  </ul></li>
+  <li><a href="#selecting-a-model" id="toc-selecting-a-model" class="nav-link" data-scroll-target="#selecting-a-model"><span class="header-section-number">1.3</span> Selecting a Model</a>
+  <ul class="collapse">
+  <li><a href="#example-bias-variance-tradeoff" id="toc-example-bias-variance-tradeoff" class="nav-link" data-scroll-target="#example-bias-variance-tradeoff"><span class="header-section-number">1.3.1</span> Example: Bias-Variance Tradeoff</a></li>
+  <li><a href="#sec-four-models" id="toc-sec-four-models" class="nav-link" data-scroll-target="#sec-four-models"><span class="header-section-number">1.3.2</span> Example: Four Penguin Models</a></li>
+  </ul></li>
+  <li><a href="#selecting-features" id="toc-selecting-features" class="nav-link" data-scroll-target="#selecting-features"><span class="header-section-number">1.4</span> Selecting Features</a></li>
+  <li><a href="#sec-evaluating-models" id="toc-sec-evaluating-models" class="nav-link" data-scroll-target="#sec-evaluating-models"><span class="header-section-number">1.5</span> Evaluating Models</a>
+  <ul class="collapse">
+  <li><a href="#partitioning-data" id="toc-partitioning-data" class="nav-link" data-scroll-target="#partitioning-data"><span class="header-section-number">1.5.1</span> Partitioning Data</a></li>
+  <li><a href="#example-cross-validated-knn" id="toc-example-cross-validated-knn" class="nav-link" data-scroll-target="#example-cross-validated-knn"><span class="header-section-number">1.5.2</span> Example: Cross-Validated kNN</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/01_supervised.html"><strong>Machine Learning in R</strong></a></li><li class="breadcrumb-item"><a href="../chapters/01_supervised.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Supervised Learning</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Supervised Learning</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1.1</span> Introduction</h2>
+<p><strong>Supervised learning</strong> methods learn from training data in order to make predictions about new data.</p>
+<p>Before going further, let’s review some necessary vocabulary:</p>
+<ul>
+<li>A <strong>unit</strong> is an entity of interest in a data set. Units are sometimes also called subjects.</li>
+<li>An <strong>observation</strong> is all measurements for a single unit. Observations are sometimes also called cases.</li>
+<li>A <strong>feature</strong> is a single measurement across all units. Features are sometimes also called variables, covariates, or predictors.</li>
+<li>A <strong>response</strong> is a feature that you want to predict.</li>
+</ul>
+<p>For example, suppose you’ve collected a data set with the age, height, and species of every tree in your neighborhood. Each tree is a unit. Each (age, height, species) measurement for a tree is an observation. The features are age, height, and species. If you want to use supervised learning to predict height based on age and species, then height is a response. 🌲🌳🌴</p>
+<p>Problems and methods are conventionally described in terms of the type of response:</p>
+<ul>
+<li><strong>Regression</strong> refers to a numerical response.</li>
+<li><strong>Classification</strong> refers to a categorical response. We call the categories <strong>classes</strong>.</li>
+</ul>
+<p>Continuing the trees example, if you want to predict height in meters, you have a regression problem. If you want to predict species, you have a classification problem.</p>
+<p>This chapter focuses on classification, but many of the concepts covered here are equally relevant to regression. Moreover, there are regression variants of many classification methods. In fact, many classifiers are just a combination of a regression method that predicts class probabilities and a decision rule that selects a class based on the prediction.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If you want to learn more about regression, see DataLab’s <a href="https://ucdavisdatalab.github.io/workshop_regression/">Introduction to Regression Modeling in R workshop series</a>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Caution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Classification methods are reductive: they assume that classes are mutually exclusive and only predict one class for each data point.</p>
+<p>In contexts where predictions are meant to inform people making decisions, regression methods are often more appropriate and yield more informative predictions (for example, class probabilities). Frank Harrell (Professor of Biostatistics, Vanderbilt University) discusses this in his post <a href="https://www.fharrell.com/post/classification/">Classification vs.&nbsp;Prediction</a>.</p>
+<p>On the other hand, classification methods often work well for automating decisions or tasks that are straightforward but tedious, especially if the stakes are low.</p>
+</div>
+</div>
+<p>A supervised learning method consists of:</p>
+<ul>
+<li>A <strong>model</strong> for making predictions, with assumptions and adjustable <strong>parameters</strong> that govern what predictions are made.</li>
+<li>A <strong>loss function</strong> for measuring the real or abstract cost of incorrect predictions.</li>
+</ul>
+<p>Methods “learn” by selecting parameter values that minimize loss for predictions about training data, in the hope that these values will generalize well to new data.</p>
+<p>Most models also have <strong>hyperparameters</strong> (or tuning parameters), parameters that are not learned and must instead be specified before training. Usually, these control how much the model adapts to the training data. To select hyperparameter values, use your own knowledge about the data as well as model evaluation techniques (see <a href="#sec-evaluating-models" class="quarto-xref"><span>Section 1.5</span></a>).</p>
+<p>The next section presents an overview of packages for supervised learning in R, some of which are demonstrated in later examples. Subsequent sections explain how to select features, how to select a model, and common model evaluation strategies, including data partitioning and cross-validation. The chapter ends with a short discussion of how to improve model performance and where to go to learn more.</p>
+</section>
+<section id="packages" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="packages"><span class="header-section-number">1.2</span> Packages</h2>
+<p>The R community has developed dozens of machine learning packages to supplement R’s small selection of built-in functions. A majority of these provide a single method or family of methods (such as decision trees).</p>
+<p>The <a href="https://cran.r-project.org/view=MachineLearning">CRAN Task View: Machine Learning page</a> is a good starting point for finding packages related to supervised learning. The task view is regularly updated by the CRAN administrators and only lists popular, actively-maintained packages.</p>
+<!-- (for unsupervised learning, see TODO)-->
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If the task view doesn’t list a package for a method you want to use, try searching the web. Many packages hosted on CRAN or GitHub are not listed in the task view because they’re obscure, unmaintained, or in early development. None of these things mean a package won’t work, although you might want to check the package code carefully to make sure it does what you expect.</p>
+</div>
+</div>
+<p>Different packages generally provide different programming interfaces. This makes studying machine learning in R difficult: in addition to learning each method, you must also learn the idiosyncrasies of each package. This also makes it difficult to compare methods by swapping them in and out of a data processing pipeline. To address this, some community members have developed packages that provide a common programming interface on top of existing, independent methods packages. Others have developed omnibus packages that implement a wide variety of methods. These packages are listed below from most to least CRAN downloads in March 2024.</p>
+<ul>
+<li><a href="https://topepo.github.io/caret/">caret</a> is a common interface for training models with existing packages, as well as a collection of functions for related tasks (such as splitting data).</li>
+<li><a href="https://www.tidymodels.org/">tidymodels</a> is a metapackage (a collection of packages) for supervised learning designed to work well with <a href="https://www.tidyverse.org/">tidyverse</a> packages. In some respects, this is the successor to caret. Especially important are the packages:
+<ul>
+<li><a href="https://parsnip.tidymodels.org/">parsnip</a> provides a common interface for existing methods packages, or “engines” in the terminology of parsnip. For some methods, multiple engines are available, while for others, there is only one.</li>
+<li><a href="https://rsample.tidymodels.org/">rsample</a> provides functions to partition and sample data sets.</li>
+<li><a href="https://yardstick.tidymodels.org/">yardstick</a> provides functions to compute a variety of performance statistics.</li>
+<li><a href="https://broom.tidymodels.org/">broom</a> provides functions to summarize model results in data frames.</li>
+</ul></li>
+<li><a href="https://cran.r-project.org/web/packages/h2o/">h2o</a> is an omnibus machine learning package, with implementations of many popular supervised and unsupervised learning methods. h2o is available for many different programming languages and places emphasis on computational efficiency.</li>
+<li><a href="https://mlr3.mlr-org.com/">mlr3</a> and <a href="https://mlr3learners.mlr-org.com/">mlr3learners</a> provide a common, object-oriented interface for existing methods packages.</li>
+<li><a href="https://cran.r-project.org/web/packages/SuperLearner/">SuperLearner</a> is an omnibus machine learning package designed to evaluate multiple methods and select the best combination of them.</li>
+<li><a href="https://cran.r-project.org/web/packages/qeML/">qeML</a> is a relatively new package that provides a common interface for existing methods, intended to be easier to use than tidymodels and mlr3. qeML is developed by <a href="https://faculty.engineering.ucdavis.edu/matloff/">UC Davis Professor Emeritus Norm Matloff</a>.</li>
+</ul>
+<p>The caret, tidymodels, and h2o packages are all relatively complete solutions with detailed documentation, many users, and many contributors.</p>
+<section id="sec-penguins" class="level3" data-number="1.2.1">
+<h3 data-number="1.2.1" class="anchored" data-anchor-id="sec-penguins"><span class="header-section-number">1.2.1</span> Example: Classifying Penguins</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../images/lter_penguins.png" class="img-fluid figure-img"></p>
+<figcaption>Chinstrap, Gentoo, and Adélie penguins. Artwork by <a href="https://allisonhorst.com/">Allison Horst</a>.</figcaption>
+</figure>
+</div>
+<p>In this example, we’ll fit a <span class="math inline">\(k\)</span>-nearest neighbors (kNN) classifier with the tidymodels package. In <span class="math inline">\(k\)</span>-nearest neighbors, new observations are classified by taking a majority vote of the classes of the <span class="math inline">\(k\)</span> nearest training set observations. Generally, we choose odd <span class="math inline">\(k\)</span> to prevent ties, although there are schemes for breaking ties if <span class="math inline">\(k\)</span> is even.</p>
+<p>As an example data set, we’ll use the Palmer Penguins data set, which was collected by <a href="https://www.uaf.edu/cfos/people/faculty/detail/kristen-gorman.php">Dr.&nbsp;Kristen Gorman</a> at <a href="https://pallter.marine.rutgers.edu/">Palmer Station, Antarctica</a>. The data set records physical characteristics for hundreds of individual penguins from three different species: <a href="https://en.wikipedia.org/wiki/Ad%C3%A9lie_penguin">Adélie</a>, <a href="https://en.wikipedia.org/wiki/Chinstrap_penguin">Chinstrap</a>, and <a href="https://en.wikipedia.org/wiki/Gentoo_penguin">Gentoo</a>.</p>
+<p>The data set is available for R in the <a href="https://allisonhorst.github.io/palmerpenguins/">palmerpenguins</a> package. We’ll also use several other packages in this example. To install them all:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"palmerpenguins"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"ggplot2"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"tidymodels"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Load the palmerpenguins package, which will automatically create a <code>penguins</code> variable, and take a look at the first few observations:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"palmerpenguins"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(penguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 8
+  species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+  &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;
+1 Adelie  Torgersen           39.1          18.7               181        3750
+2 Adelie  Torgersen           39.5          17.4               186        3800
+3 Adelie  Torgersen           40.3          18                 195        3250
+4 Adelie  Torgersen           NA            NA                  NA          NA
+5 Adelie  Torgersen           36.7          19.3               193        3450
+6 Adelie  Torgersen           39.3          20.6               190        3650
+# ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;</code></pre>
+</div>
+</div>
+<p>It’s a good idea to do some exploratory analysis before fitting a model. We can use ggplot2 to plot bill length, body mass, and species for each penguin:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"ggplot2"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>plt <span class="ot">=</span> <span class="fu">ggplot</span>(penguins) <span class="sc">+</span> <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">aes</span>(<span class="at">shape =</span> species, <span class="at">color =</span> species)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>plt <span class="sc">%+%</span> <span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm, <span class="at">y =</span> body_mass_g)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 2 rows containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_supervised_files/figure-html/ex01_plot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Other plots that might be of interest:</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># plt %+% aes(x = bill_length_mm, y = bill_depth_mm)</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># plt %+% aes(x = bill_length_mm, y = flipper_length_mm)</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># plt %+% aes(x = bill_depth_mm, y = body_mass_g)</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># plt %+% aes(x = bill_depth_mm, y = flipper_length_mm)</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># plt %+% aes(x = flipper_length_mm, y = body_mass_g)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The plot shows that the three species of penguins are relatively well-separated by bill length and body mass. Adélie penguins have relatively short bills and light bodies, Chinstrap penguins have relatively long bills and light bodies, and Gentoo penguins have relatively long bills and heavy bodies. The species only overlap for a few penguins. This separation is a sign that a classifier is likely to work well.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Classification is more difficult when the classes are not well-separated by the features, but not necessarily intractible. Sometimes it’s possible to transform features to provide better separation. Some models can also take advantage of interactions between features that are not readily apparent in scatter plots.</p>
+</div>
+</div>
+<p>Initial exploratory analysis is also when you should check data for outliers and missing values. The previous plot didn’t show any signs of extreme outliers. Now let’s check for missing values:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(penguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      species          island    bill_length_mm  bill_depth_mm  
+ Adelie   :152   Biscoe   :168   Min.   :32.10   Min.   :13.10  
+ Chinstrap: 68   Dream    :124   1st Qu.:39.23   1st Qu.:15.60  
+ Gentoo   :124   Torgersen: 52   Median :44.45   Median :17.30  
+                                 Mean   :43.92   Mean   :17.15  
+                                 3rd Qu.:48.50   3rd Qu.:18.70  
+                                 Max.   :59.60   Max.   :21.50  
+                                 NA's   :2       NA's   :2      
+ flipper_length_mm  body_mass_g       sex           year     
+ Min.   :172.0     Min.   :2700   female:165   Min.   :2007  
+ 1st Qu.:190.0     1st Qu.:3550   male  :168   1st Qu.:2007  
+ Median :197.0     Median :4050   NA's  : 11   Median :2008  
+ Mean   :200.9     Mean   :4202                Mean   :2008  
+ 3rd Qu.:213.0     3rd Qu.:4750                3rd Qu.:2009  
+ Max.   :231.0     Max.   :6300                Max.   :2009  
+ NA's   :2         NA's   :2                                 </code></pre>
+</div>
+</div>
+<p>kNN classifiers can’t handle missing values, and only a few observation have them, so let’s remove these observations from the data set:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>peng <span class="ot">=</span> <span class="fu">na.omit</span>(penguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now let’s train a kNN classifier with tidymodels. Specifically, we’ll use the parsnip package, which is included with tidymodels and provides a common interface for a wide variety of supervised learning models.</p>
+<p>Training with parsnip follows the same two steps for every model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="annotated-cell-7"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-7-1"><a href="#annotated-cell-7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"parsnip"</span>)</span>
+<span id="annotated-cell-7-2"><a href="#annotated-cell-7-2" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-7-3" class="code-annotation-target"><a href="#annotated-cell-7-3" aria-hidden="true" tabindex="-1"></a>knn <span class="ot">=</span> <span class="fu">nearest_neighbor</span>(<span class="st">"classification"</span>, <span class="at">neighbors =</span> <span class="dv">10</span>)</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-7-4" class="code-annotation-target"><a href="#annotated-cell-7-4" aria-hidden="true" tabindex="-1"></a>fitted <span class="ot">=</span> <span class="fu">fit</span>(knn, species <span class="sc">~</span> bill_length_mm <span class="sc">+</span> body_mass_g, peng)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-7" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-7" data-code-lines="3" data-code-annotation="1">Initialize a model and set hyperparameters by calling a model function. In this case, we use <code>nearest_neighbor</code> since we want a kNN model, and set the number of neighbors to 10.</span>
+</dd>
+<dt data-target-cell="annotated-cell-7" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-7" data-code-lines="4" data-code-annotation="2">Train the model by calling <code>fit</code> with the model, a formula <code>~</code> that specifies the response on the left-hand side and the predictors on the right-hand side, and the data.</span>
+</dd>
+</dl>
+</div>
+</div>
+<p>You can print the fitted model to get more information:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fitted</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>parsnip model object
+
+
+Call:
+kknn::train.kknn(formula = species ~ bill_length_mm + body_mass_g,     data = data, ks = min_rows(10, data, 5))
+
+Type of response variable: nominal
+Minimal misclassification: 0.06006006
+Best kernel: optimal
+Best k: 10</code></pre>
+</div>
+</div>
+<p>This shows the type of response, an error rate estimate on the training set, <strong>kernel</strong> ( distance-weighting function used in the class vote), and choice of <span class="math inline">\(k\)</span> (misleadingly listed as “Best k”). The kernel is actually another hyperparameter for this model, but parsnip selects a reasonable kernel by default. You can find the hyperparameters and their default values for a model on the model function’s help page. In this case, that’s <code>?nearest_neighbor</code>.</p>
+<p>Once you’ve trained a model, you can use it with the <code>predict</code> function to make predictions. The <code>predict</code> function takes the fitted model and a data set with the same columns (excluding the response) as the training set as arguments. The function returns the predictions in a 1-column data frame.</p>
+<p>To try out <code>predict</code>, let’s calculate the error on the training set manually. First, predict the class for each observation in the training set:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>preds <span class="ot">=</span> <span class="fu">predict</span>(fitted, peng)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>preds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 333 × 1
+   .pred_class
+   &lt;fct&gt;      
+ 1 Adelie     
+ 2 Adelie     
+ 3 Adelie     
+ 4 Adelie     
+ 5 Adelie     
+ 6 Adelie     
+ 7 Adelie     
+ 8 Adelie     
+ 9 Adelie     
+10 Adelie     
+# ℹ 323 more rows</code></pre>
+</div>
+</div>
+<p>Notice that <code>predict</code> returns a data frame with a single column named <code>.pred_class</code>. The return value is always a data frame with a <code>.pred_class</code> column, regardless of the model used.</p>
+<p>Now compute the proportion of incorrect predictions:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(peng<span class="sc">$</span>species <span class="sc">!=</span> preds<span class="sc">$</span>.pred_class) <span class="sc">/</span> <span class="fu">nrow</span>(peng)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.04504505</code></pre>
+</div>
+</div>
+<p>Since the model was trained on these penguins, this error rate likely underestimates the error rate for new penguins. Moreover, this is an overall error rate and doesn’t tell us much about error rates for the individual species.</p>
+<p>We can get a slightly better idea of the model’s behavior by plotting the data again, marking the misclassified penguins:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>incorrect <span class="ot">=</span> peng<span class="sc">$</span>species <span class="sc">!=</span> preds<span class="sc">$</span>.pred_class</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(peng) <span class="sc">+</span> <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">shape =</span> species,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> incorrect) <span class="sc">+</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"gray"</span>, <span class="st">"red"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_supervised_files/figure-html/ex01_error_plot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The plot shows that most of the misclassified penguins are in regions where one group overlaps with another. We’ll revisit this data set and model in subsequet examples, to learn about better evaluation methods and about strategies for improving the fit.</p>
+</section>
+</section>
+<section id="selecting-a-model" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="selecting-a-model"><span class="header-section-number">1.3</span> Selecting a Model</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../figures/scikit_learn_classifiers.png" class="img-fluid figure-img"></p>
+<figcaption>Classification boundaries for ten different models across three different data sets. Visualization by <a href="https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html#sphx-glr-auto-examples-classification-plot-classifier-comparison-py">G. Varoquaux, A. Müller, &amp; J. Grobler</a>.</figcaption>
+</figure>
+</div>
+<p>The <strong>No Free Lunch Theorem</strong> states that there is no single “best” supervised learning model. Different models make different assumptions, and will work better for data that satisfy those assumptions. Generally, you should select a model by comparing several different models and using whatever knowledge you have about the data.</p>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Caution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The wide variety of models people have invented can be distracting. For improving predictive performance, it’s almost always more effective to collect more data or to select or engineer better features than it is to switch models.</p>
+</div>
+</div>
+<p>In spite of the No Free Lunch Theorem, some models <em>are</em> more general than others, and make good starting points. Here’s a list of some well-known classification models, where ✨ indicates a good starting point model:</p>
+<ul>
+<li>✨ Decision trees (<a href="https://mlu-explain.github.io/decision-tree/">classification tree guide</a>, <a href="https://mlu-explain.github.io/random-forest/">random forest guide</a>)
+<ul>
+<li>Pros: easy to interpret, can handle missing data, selects features automatically</li>
+<li>Cons: prone to overfitting, sensitive to class imbalance, training is computationally expensive</li>
+<li>Takeaway: random forests and boosted trees, which address overfitting at the cost of interpretability, perform well on a wide variety of problems</li>
+</ul></li>
+<li>✨ Generalized linear models (GLM) (<a href="https://mlu-explain.github.io/logistic-regression/">logistic regression guide</a>)
+<ul>
+<li>Pros: easy to interpret, training is computationally cheap, well-understood statistical properties, robust on small data sets</li>
+<li>Cons: moderate assumptions (linearity)</li>
+<li>Takeaway: GLMs have a long history but remain effective, especially for smaller data sets</li>
+</ul></li>
+<li>✨ <span class="math inline">\(k\)</span>-nearest neighbors (kNN)
+<ul>
+<li>Pros: conceptually simple</li>
+<li>Cons: prediction is computationally expensive, poor performance at high number of features</li>
+<li>Takeaway: appropriate for small to medium data sets</li>
+</ul></li>
+<li>Naive Bayes
+<ul>
+<li>Pros: conceptually simple, scales well</li>
+<li>Cons: strong assumptions (independence), only for classification</li>
+<li>Takeaway: useful for very large data sets</li>
+</ul></li>
+<li>Support vector machines (SVM)
+<ul>
+<li>Pros: okay with high number of features</li>
+<li>Cons: hard to interpret, conceptually complex, binary by default</li>
+<li>Takeaway: SVMs have become less popular than tree models in recent years, but can still be effective for many problems</li>
+</ul></li>
+<li>Discriminant analysis (DA)
+<ul>
+<li>Pros: well-understood statistical properties</li>
+<li>Cons: strong assumptions (normality), only for classification</li>
+<li>Takeaway: there are better models</li>
+</ul></li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For another perspective on selecting a model, see <a href="https://scikit-learn.org/stable/tutorial/machine_learning_map/">the scikit-learn algorithm cheat sheet</a>.</p>
+<p>Although scikit-learn is a Python package, <a href="https://scikit-learn.org/stable/user_guide.html">its user guide</a> is also an excellent, concise reference for machine learning concepts (without any code).</p>
+</div>
+</div>
+<p>For most models, there’s a tradeoff between simplicity (in the sense of fewer parameters) and flexibility.</p>
+<p>Simple models make strong assumptions about the data, so there are fewer parameters to estimate. If the assumptions are satisfied, simple models perform well even when the number of observations is low or the observations are relatively noisy. However, if the assumptions aren’t satisfied, simple models tend to <strong>underfit</strong>, meaning they fail to learn the signal in the training data. Error in an underfit model is mostly <strong>bias</strong> caused by the assumptions.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Bias is a specific statistical term which doesn’t carry the same connotation of unfairness as the common English meaning. Instead, it means that on average, a model’s predicted values differ from the actual values.</p>
+<p>Whether or not statistical bias makes a model unfair depends on the context in which the model will be used. For contexts where it doesn’t, there are often good reasons to accept some bias.</p>
+</div>
+</div>
+<p>Flexible models make only weak assumptions about the data. If the number of observations is high and the observations are not too noisy, flexible models typically perform well. However, if the number of observations is low or the observations are very noisy, flexible models tend to <strong>overfit</strong>, learning the noise in the training data instead of the signal. As a result, the model will not generalize well to new observations. Error in an overfit model is mostly due to <strong>variance</strong>, meaning the model is too sensitive to small changes in the training set.</p>
+<p>Simple versus flexible is spectrum, and models usually provide hyperparameters to control how simple or flexible the model is. One example is <span class="math inline">\(k\)</span> in <span class="math inline">\(k\)</span>-nearest neighbors. For <span class="math inline">\(k\)</span> close to the number of observations, the model is simple and biased in favor of the majority class. For <span class="math inline">\(k\)</span> close to 1, the model is flexible: it uses only a few observations in the training set to make each prediction, and thus is susceptible to noisy or anomalous observations.</p>
+<p>The tradeoff between simple and flexible models is more commonly known as the <strong>bias-variance tradeoff</strong>. You can learn more about the bias-variance tradeoff from <a href="https://mlu-explain.github.io/bias-variance/">this interactive demo</a>.</p>
+<section id="example-bias-variance-tradeoff" class="level3" data-number="1.3.1">
+<h3 data-number="1.3.1" class="anchored" data-anchor-id="example-bias-variance-tradeoff"><span class="header-section-number">1.3.1</span> Example: Bias-Variance Tradeoff</h3>
+<p>Simulations are a great way to answer questions about or demonstrate properties of machine learning models. Let’s use a simulation to demonstrate the bias-variance tradeoff.</p>
+<p>First, let’s generate some data along this curve:</p>
+<p><span class="math display">\[
+y = x^3 - 10 e^{-0.5 (x - 3)^2} + 1
+\]</span></p>
+<p>Any non-polynomial curve will do, but we’ll use this one because it plots nicely. To generate points for <span class="math inline">\(x\)</span> in <span class="math inline">\([-1, 1]\)</span> run:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">=</span> <span class="dv">80</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">runif</span>(n, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> x<span class="sc">^</span><span class="dv">3</span> <span class="sc">-</span> <span class="dv">10</span> <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="fl">0.5</span> <span class="sc">*</span> (x <span class="sc">-</span> <span class="dv">3</span>)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now let’s make several copies of these points, with random noise added to the <span class="math inline">\(y\)</span> coordinates, to simulate collecting multiple samples with measurement error. To simulate 20 samples:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>n_samples <span class="ot">=</span> <span class="dv">20</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">rep</span>(x, n_samples)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>noise <span class="ot">=</span> <span class="fu">rnorm</span>(n <span class="sc">*</span> n_samples, <span class="dv">0</span>, <span class="fl">0.05</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> <span class="fu">rep</span>(y, n_samples) <span class="sc">+</span> noise</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Store the points in a data frame with sample ID.</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>sample_id <span class="ot">=</span> <span class="fu">rep</span>(<span class="fu">seq</span>(n_samples), <span class="at">each =</span> n)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>data <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">sample_id =</span> sample_id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Before we fit any models, let’s plot one of the samples to see what it looks like:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>sample01 <span class="ot">=</span> <span class="fu">subset</span>(data, sample_id <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(sample01) <span class="sc">+</span> <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y) <span class="sc">+</span> <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_supervised_files/figure-html/ex02_data_plot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Now let’s fit two models to each sample:</p>
+<ol type="1">
+<li>Since the data look somewhat quadratic, we’ll fit a linear model with <span class="math inline">\(x\)</span> and <span class="math inline">\(x^2\)</span> as features. This will be our simple, high-bias model.</li>
+<li>We’ll also fit a model that’s just the mean of every 3 points. Although this model is conceptually simple, it will be our flexible, high-variance model.</li>
+</ol>
+<p>We’ll use the following function to fit the models. Note that it uses the zoo package’s <code>rollmean</code> function to fit the 3-point mean model, where “fit” really just means computing the means. For the linear model, the function fits the model with <code>lm</code> and then computes points on the regression line for a grid of <span class="math inline">\(x\)</span> coordinates.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("zoo")</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"zoo"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'zoo'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>fit_models <span class="ot">=</span> <span class="cf">function</span>(samp) {</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Sort the points by x coordinate.</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  samp <span class="ot">=</span> samp[<span class="fu">order</span>(samp<span class="sc">$</span>x), ]</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Fit the linear model.</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  fitted_lm <span class="ot">=</span> <span class="fu">lm</span>(y <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> x <span class="sc">+</span> <span class="fu">I</span>(x<span class="sc">^</span><span class="dv">2</span>), samp)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Evaluate the linear model on a grid.</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  grid <span class="ot">=</span> <span class="fu">seq</span>(<span class="fu">min</span>(samp<span class="sc">$</span>x), <span class="fu">max</span>(samp<span class="sc">$</span>x), <span class="at">length.out =</span> <span class="dv">1000</span>)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  lm_pts <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x =</span> grid)</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  lm_pts<span class="sc">$</span>yhat <span class="ot">=</span> <span class="fu">predict</span>(fitted_lm, lm_pts)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  lm_pts<span class="sc">$</span>model <span class="ot">=</span> <span class="st">"linear"</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Fit the 3-point mean model.</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>  mean3_pts <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># All x except first and last.</span></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> samp<span class="sc">$</span>x[<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(samp))],</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">yhat =</span> <span class="fu">rollmean</span>(samp<span class="sc">$</span>y, <span class="dv">3</span>),</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">model =</span> <span class="st">"3-point mean"</span></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Combine into a single data frame.</span></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>  fitted <span class="ot">=</span> <span class="fu">rbind</span>(lm_pts, mean3_pts)</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>  fitted<span class="sc">$</span>sample_id <span class="ot">=</span> samp<span class="sc">$</span>sample_id[[<span class="dv">1</span>]]</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>  fitted</span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can us the <code>fit_models</code> with <code>split</code> and <code>lapply</code> to fit the models to each sample, and then combine all of the predictions into a single data frame:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>by_sample <span class="ot">=</span> <span class="fu">split</span>(data, data<span class="sc">$</span>sample_id)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>fitted <span class="ot">=</span> <span class="fu">lapply</span>(by_sample, fit_models)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>fitted <span class="ot">=</span> <span class="fu">do.call</span>(rbind, fitted)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Finally, let’s plot the fitted models:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(fitted) <span class="sc">+</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Plot the points from one sample as an example.</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y), sample01, <span class="at">color =</span> <span class="st">"gray"</span>) <span class="sc">+</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Plot the fitted models.</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> yhat, <span class="at">group =</span> sample_id, <span class="at">color =</span> <span class="fu">factor</span>(sample_id)),</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(model)) <span class="sc">+</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_supervised_files/figure-html/ex02_fit_plot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The plot shows that the 3-sample mean model varies far more across samples than the linear model. In other words, the 3-sample mean model has high variance. The linear model is more stable, but doesn’t follow the training data as well—it has high bias.</p>
+<p>Simulations like this one are an important tool in every machine learning practicioner’s toolkit. You can use them to get a rough idea of how a model or estimator will behave under specific conditions. This example is based on one from <a href="https://bookdown.org/max/FES/">Feature Engineering and Selection: A Practical Approach for Predictive Models</a> by M. Kuhn &amp; K. Johnson.</p>
+</section>
+<section id="sec-four-models" class="level3" data-number="1.3.2">
+<h3 data-number="1.3.2" class="anchored" data-anchor-id="sec-four-models"><span class="header-section-number">1.3.2</span> Example: Four Penguin Models</h3>
+<p>Let’s revisit the Palmer penguins data from <a href="#sec-penguins" class="quarto-xref"><span>Section 1.2.1</span></a>. This time, we’ll fit several different models, in order to examine how much accuracy differs between them.</p>
+<p>In order to get reliable accuracy estimates, let’s randomly split the data into two parts: a training set and a test set. The training set will contain 75% of the observations and the test set will contain the remaining 25%. We’ll train the models on the training set, and estimate accuracy on the test set. This ensures that we won’t overestimate the accuracy.</p>
+<p>Splitting data into a training set and test set is a common practice. The rsample package, which is included in tidymodels, provides an <code>initial_split</code> function to split a data set. The default split is 75-25. You can use the accompanying <code>training</code> and <code>testing</code> functions to get the training set and test set from the split object:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"rsample"</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Set a seed to make the split reproducible.</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">10332</span>)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>splitted <span class="ot">=</span> <span class="fu">initial_split</span>(peng)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>peng_train <span class="ot">=</span> <span class="fu">training</span>(splitted)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>peng_test <span class="ot">=</span> <span class="fu">testing</span>(splitted)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now let’s fit the models and compute error estimates. This time, we’ll use all four numeric features in the data set: bill length, bill depth, flipper length, and body mass. We’ll use the default hyperparameters for each model except <span class="math inline">\(k\)</span>-nearest neighbors, where there is no default for <span class="math inline">\(k\)</span>. We’ll use <span class="math inline">\(k = 15\)</span>, since a rule of thumb for choosing <span class="math inline">\(k\)</span> is to use <span class="math inline">\(\sqrt{n}\)</span>, where <span class="math inline">\(n\)</span> is the number of observations in the training set. For the penguins data:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">nrow</span>(peng_train))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 15.77973</code></pre>
+</div>
+</div>
+<p>To fit the models, run:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>models <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># k-nearest neighbors</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">knn =</span> <span class="fu">nearest_neighbor</span>(<span class="st">"classification"</span>, <span class="at">neighbors =</span> <span class="dv">15</span>),</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Classification tree</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">tree =</span> <span class="fu">decision_tree</span>(<span class="st">"classification"</span>),</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Multinomial regression (a linear model)</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">multinomial =</span> <span class="fu">multinom_reg</span>(<span class="st">"classification"</span>),</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Support vector machine</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">svm =</span> <span class="fu">svm_rbf</span>(<span class="st">"classification"</span>)</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>form <span class="ot">=</span></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  species <span class="sc">~</span> bill_length_mm <span class="sc">+</span> bill_depth_mm <span class="sc">+</span> flipper_length_mm <span class="sc">+</span> body_mass_g</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(models, <span class="cf">function</span>(model) {</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>  fitted <span class="ot">=</span> <span class="fu">fit</span>(model, form, peng_train)</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>  predicted <span class="ot">=</span> <span class="fu">predict</span>(fitted, peng_test)<span class="sc">$</span>.pred_class</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(peng_test<span class="sc">$</span>species <span class="sc">==</span> predicted) <span class="sc">/</span> <span class="fu">nrow</span>(peng_test)</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        knn        tree multinomial         svm 
+  0.9880952   0.9285714   0.9761905   0.9761905 </code></pre>
+</div>
+</div>
+<p>All of the models predict with accuracy above 92%, and three are within 1 of 97%. This example shows that for this data set, the choice of model has a relatively minor effect on accuracy. That’s the case for many data sets. Having enough observations and selecting or engineering relevant features is far more important.</p>
+</section>
+</section>
+<section id="selecting-features" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="selecting-features"><span class="header-section-number">1.4</span> Selecting Features</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../figures/data_science_workflow.png" class="img-fluid figure-img"></p>
+<figcaption>In a typical data science workflow, modeling is just one step among many and depends on the other steps. As with writing essays, modeling is usually a process of iterative refinement.</figcaption>
+</figure>
+</div>
+<p>In practice, the choice of method has less impact on predictive performance than the features and number of observations in the training data. Different methods <em>do make different assumptions</em>, and it’s important to think through whether the assumptions are satisfied, but no method is a substitute for data.</p>
+<p>Some models, such as random forest models, can automatically select the most relevant features for prediction in a data set. With generalized linear models, you can use <strong>regularization</strong> methods, such as LASSO or Elastic Net, which add a penalty to the model’s loss function to encourage zeroing coefficients for unimportant features. These techniques can be helpful for screening features even if you ultimately plan to use a different model. You can also use exploratory analysis to assess which features have predictive power, and should use any expert knowledge you have about the data or population from which it was sampled.</p>
+<p>Transforming features to create new features, a process known as <strong>feature engineering</strong>, can also improve model performance. Unfortunately, it can be difficult to determine which features to engineer unless you have deep knowledge about the data and problem you’re modeling.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><a href="https://bookdown.org/max/FES/">Feature Engineering and Selection: A Practical Approach for Predictive Models</a> by M. Kuhn &amp; K. Johnson is a clear and thorough reference.</p>
+</div>
+</div>
+</section>
+<section id="sec-evaluating-models" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="sec-evaluating-models"><span class="header-section-number">1.5</span> Evaluating Models</h2>
+<p>Perhaps the most informative classification model performance statistic is a <strong>confusion matrix</strong>, a cross-tabulation of actual and predicted classes. Unlike an accuracy estimate, a confusion matrix shows how well the model performs for each class. You can also use the confusion matrix to compute a variety of other statistics:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../figures/performance_metrics.png" class="img-fluid figure-img"></p>
+<figcaption>Statistics you can use to evaluate classifier performance when there are two classes. Most of these generalize to more classes. Visualization inspired by <a href="https://en.wikipedia.org/wiki/Template:Diagnostic_testing_diagram">Wikipedia’s diagnostic testing diagram</a>.</figcaption>
+</figure>
+</div>
+<p>Four widely-used statistics are:</p>
+<ul>
+<li><strong>Precision</strong>, which is the proportion of predictions for a class that are correct. High precision for a given class indicates that a model is generally correct when it predicts the class, but might fail to recognize some members of the class.</li>
+<li><strong>Recall</strong> or <strong>sensitivity</strong>, which is the proportion of a class’ members that are correctly predicted. High recall for a given class indicates the model correctly recognizes members of the class, but might also predict members of other classes are in the class.</li>
+<li><strong>Specificity</strong>, which is recall for the second class in a two-class problem.</li>
+<li>The <strong>F1 score</strong>, which is the harmonic mean of precision and recall. As a harmonic mean, the F1 score is close to 0 when precision <em>or</em> recall are and close to 1 when both precision <em>and</em> recall are.</li>
+</ul>
+<p>You learn more about precision, recall, and the F1 score from <a href="https://mlu-explain.github.io/precision-recall/">this interactive guide</a>.</p>
+<p>The figure shows the situation for a two-class problem. You can also compute all of these statistics on a per-class basis when there are more than two classes (treat all other classes as the negative class). Moreover, you can compute overall precision, recall, and F1 score by averaging the class statistics. This is known as <strong>macro-averaging</strong>.</p>
+<p>Another widely-used measure of performance for classification models is the <strong>receiver operating characteristic</strong> (ROC) curve and accompanying <strong>area under the curve</strong> (AUC). These measures are natural for classifiers that predict the probabilty of each class and use the predicted probabilities with a threshold decision rule to select the predicted class, because they show the behavior of the model for different choices of threshold. For models that do not predict class probabilities, the ROC curve does not exist, although researchers have devised ways to generalize the ROC curve to some of these models. You can learn more about ROC curves and AUC from <a href="https://mlu-explain.github.io/roc-auc/">this interactive guide</a>.</p>
+<section id="partitioning-data" class="level3" data-number="1.5.1">
+<h3 data-number="1.5.1" class="anchored" data-anchor-id="partitioning-data"><span class="header-section-number">1.5.1</span> Partitioning Data</h3>
+<p>In <a href="#sec-four-models" class="quarto-xref"><span>Section 1.3.2</span></a>, we split the Palmer penguins data set into two parts: a <strong>training set</strong> to use for training models and a <strong>testing set</strong> to use for testing models. Splitting data sets this way ensures that performance statistics computed on the testing set are accurate. If you compute performance statistics for a model with the same data set you used for training, the statisitics will have an optimistic bias. In other words, accuracy, precision, recall and other positive statistics will be overestimated, while error rate and other negative statistics will be underestimated.</p>
+<p>It’s important that the testing set is not used to train models at any point in the modeling process. Even using the testing set to select models or hyperparameters can bias the testing set estimates.</p>
+<p>Since performance statistics are also helpful for selecting models and hyperparameters, and the training set will produce biased estimates, it’s often useful to split off a small part of the training set as a <strong>validation set</strong>. The validation set should only be used for selecting models and hyperparameters, not for training or final performance statistics. You can learn more about training, validation, and testing sets from <a href="https://mlu-explain.github.io/train-test-validation/">this interactive guide</a>.</p>
+<p>You might wonder whether it’s inefficient to split the data set into so many subsets, since models generally perform better when they are trained on larger data sets. You’d be right to wonder—using a fixed training set and validation set can create a pessimistic bias in the performance statistics computed on the validation set. It also makes the statistics sensitive to any outliers or anomalous observations that end up in the validation set.</p>
+<p><strong><span class="math inline">\(k\)</span>-fold cross validition</strong> is one way to address the problems with using a fixed training set and validation set. In a <span class="math inline">\(k\)</span>-fold cross-validation scheme, the training set is split into <span class="math inline">\(k\)</span> random, equal-size subsets called <strong>folds</strong>. Then the model is fitted <span class="math inline">\(k\)</span> times, giving each fold a chance to be the validation set (the remaining folds are used as a training set). This produces <span class="math inline">\(k\)</span> estimates of any performance statistics of interest, which can be averaged to get an overall estimate. Cross-validation uses more of the data to train the model, which makes the performance statistic estimates more accurate. By averaging the estimates over several folds, it also ensures that the overall estimate is not too sensitive to unusual observations in a single fold. You can learn more about cross-validation from <a href="https://mlu-explain.github.io/cross-validation/">this interactive guide</a>.</p>
+<p>The main drawback of cross-validition is that the model must be trained more than once. For some models, training is computationally intensive, and training multiple times can be prohibitively so. For this reason, it’s common to set <span class="math inline">\(k = 5\)</span> or <span class="math inline">\(k = 10\)</span>. Smaller values of <span class="math inline">\(k\)</span> produce noisier estimates. An extreme case, known as <strong>leave-one-out cross-validation</strong> (LOOCV), sets <span class="math inline">\(k\)</span> to the size of the training set, so that each observation is a fold. LOOCV is completely deterministic, whereas for any other <span class="math inline">\(k\)</span> the cross-validation estimates vary depending on which observations end up in each fold.</p>
+</section>
+<section id="example-cross-validated-knn" class="level3" data-number="1.5.2">
+<h3 data-number="1.5.2" class="anchored" data-anchor-id="example-cross-validated-knn"><span class="header-section-number">1.5.2</span> Example: Cross-Validated kNN</h3>
+<p>Let’s revisit the Palmer penguins example that begin in <a href="#sec-penguins" class="quarto-xref"><span>Section 1.2.1</span></a> one more time. In the original example, we trained a <span class="math inline">\(k\)</span>-nearest neighbors model and arbitrarily selected <span class="math inline">\(k = 10\)</span>. In <a href="#sec-four-models" class="quarto-xref"><span>Section 1.3.2</span></a>, we selected <span class="math inline">\(k = 15\)</span> instead based on a rule of thumb. In practice, the best way to select <span class="math inline">\(k\)</span> is by estimating performance for several different values of <span class="math inline">\(k\)</span>. We can use cross validation to compute the estimates.</p>
+<p>The rsample package provides a function <code>vfold_cv</code> to compute cross-validation folds. The function returns a data frame with the folds stored in the <code>splits</code> column. For each fold, you can use the <code>training</code> function to get the training set and the <code>testing</code> function to get the validation set.</p>
+<p>For this example, let’s use 5-fold cross-validation to keep the computation time reasonable. Using more folds would give us more accurate estimates. We’ll try all odd values of <span class="math inline">\(k\)</span> from 1 to approximately the minimum number of observations in a training set:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set a seed to make this reproducible.</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1010</span>)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 5-fold cross-validation</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>folds <span class="ot">=</span> <span class="fu">vfold_cv</span>(peng_train, <span class="dv">5</span>)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a rough estimate of the minimum training set size.</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>n_train <span class="ot">=</span> <span class="fu">floor</span>((<span class="dv">4</span> <span class="sc">/</span> <span class="dv">5</span>) <span class="sc">*</span> <span class="fl">0.75</span> <span class="sc">*</span> <span class="fu">nrow</span>(peng_train))</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Try k = 1, 3, 5, ..., n_train.</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>ks <span class="ot">=</span> <span class="fu">seq</span>(<span class="dv">1</span>, n_train, <span class="dv">2</span>)</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>form <span class="ot">=</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  species <span class="sc">~</span> bill_length_mm <span class="sc">+</span> bill_depth_mm <span class="sc">+</span> flipper_length_mm <span class="sc">+</span> body_mass_g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Caution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Using <span class="math inline">\(k\)</span>-fold cross-validation this way can produce inaccurate estimates when there are more observations for some classes than others (as is the case here).</p>
+<p>It would be better to use <strong>stratified <span class="math inline">\(k\)</span>-fold cross-validation</strong>, which attempts to preserve the overall class proportions within each fold. You can do this with the <code>vfold_cv</code> function by setting the <code>strata</code> parameter to the feature you want to use for stratification (in this case, we would use <code>species</code>).</p>
+</div>
+</div>
+<p>Now we can use nested apply functions or loops to iterate over the <span class="math inline">\(k\)</span> and folds. For each fold, we’ll get the training set and train the model with the current <span class="math inline">\(k\)</span>, then predict on the test set. We can use the predictions to compute performance statistics. To keep the example simple, let’s compute overall accuracy, although in practice it’s important to look at other statistics, including per-class statistics. The code to carry out these steps is:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Loop over k values.</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>error_rates <span class="ot">=</span> <span class="fu">sapply</span>(ks, <span class="cf">function</span>(k) {</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Loop over folds.</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sapply</span>(folds<span class="sc">$</span>splits, <span class="cf">function</span>(fold) {</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Fit the model on the training set.</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    train <span class="ot">=</span> <span class="fu">training</span>(fold)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    model <span class="ot">=</span> <span class="fu">nearest_neighbor</span>(<span class="st">"classification"</span>, <span class="at">neighbors =</span> k,</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">weight_func =</span> <span class="st">"rectangular"</span>)</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    fitted <span class="ot">=</span> <span class="fu">fit</span>(model, form, train)</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Predict on the test set.</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>    test <span class="ot">=</span> <span class="fu">testing</span>(fold)</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>    preds <span class="ot">=</span> <span class="fu">predict</span>(fitted, test)</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(test<span class="sc">$</span>species <span class="sc">!=</span> preds<span class="sc">$</span>.pred_class) <span class="sc">/</span> <span class="fu">nrow</span>(test)</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The result from the code is a matrix of estimates. Each row corresponds to one value of <span class="math inline">\(k\)</span>, while each column corresponds to one fold. Let’s compute an overall estimate for each <span class="math inline">\(k\)</span> with the <code>colMeans</code> function, and then plot the estimates against <span class="math inline">\(k\)</span>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>estimates <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">k =</span> ks,</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">error =</span> <span class="fu">colMeans</span>(error_rates)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(estimates) <span class="sc">+</span> <span class="fu">aes</span>(<span class="at">x =</span> k, <span class="at">y =</span> error) <span class="sc">+</span> <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_supervised_files/figure-html/ex04_plot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>For this particular data set, it looks like <span class="math inline">\(k = 1\)</span> provides the best accuracy. This may seem somewhat surprising because of the bias-variance tradeoff, and it is a good idea to double-check your code in situations like this. However, for this data set, each penguin species is so well-separated by the four features that <span class="math inline">\(k = 1\)</span> really does work well. If we wanted the use the model for new samples of penguins, it might still be a good idea to choose a slightly higher <span class="math inline">\(k\)</span> value just in case this data set happens to have less variation than the population.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../index.html" class="pagination-link" aria-label="Overview">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Overview</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/02_unsupervised.html" class="pagination-link" aria-label="Unsupervised Learning">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Unsupervised Learning</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
