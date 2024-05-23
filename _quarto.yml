@@ -10,9 +10,10 @@ book:
     logo-href: https://datalab.ucdavis.edu/
   chapters:
     - index.qmd
-    - chapters/01_introduction.qmd
-    - chapters/02_unsupervised.qmd
-    - chapters/03_supervised.qmd
+    - part: "**Machine Learning in R**"
+      chapters:
+      - chapters/01_supervised.qmd
+      - chapters/02_unsupervised.qmd
     - chapters/references.qmd
 
 bibliography: references.bib

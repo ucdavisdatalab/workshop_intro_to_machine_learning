@@ -1,5 +1,58 @@
 # Overview {.unnumbered}
 
-This is a Quarto book.
+This collection of workshops provides an introduction to machine learning. The
+collection has two standalone parts:
 
-To learn more about Quarto books visit <https://quarto.org/docs/books>.
+* **Overview of Machine Learning** (one 2-hour session): This is a
+  non-technical workshop that emphasizes building vocabulary and gaining an
+  intuitive understanding of machine learning concepts and methods. Start here
+  if you're new to machine learning and want to get a sense of what it's about
+  and whether it's relevant to you. There's no code in this workshop and only a
+  little (high-school level) math. This workshop is also good preparation for
+  the Machine Learning in R series.
+
+  ::: {.callout-note title="Learning Goals" collapse="true"}
+  After completing this workshop, learners should be able to:
+
+  * Define the following terms: observation, feature, machine learning,
+    supervised learning, unsupervised learning, regression, classification,
+    clustering, training set, validation set, test set, cross-validation,
+    overfitting, underfitting, model bias, model variance, bias-variance
+    tradeoff, ensemble model.
+  * Explain the difference between supervised and unsupervised learning.
+  * Explain the difference between regression and classification.
+  * List and briefly describe popular machine learning methods.
+  * Give an example of an ensemble model.
+  * Explain what cross-validation is used for and give an overview of the
+    procedure.
+  * Assess whether and which machine learning methods might be helpful for a
+    given research problem.
+  :::
+
+  ::: {.callout-important}
+  [This slide deck][overview-slides] is the only material for this workshop.
+  :::
+
+* **Machine Learning in R** (two 2-hour sessions): This is a hands-on,
+  technical introduction to using machine learning methods in R. The two
+  sessions cover and include examples of supervised learning (emphasis on
+  classification), model evaluation, unsupervised learning (emphasis on
+  clustering), and dimension reduction. The sessions also provide advice for
+  navigating R's fractured machine learning package landscape. Intermediate
+  familiarity with R programming (equivalent to completing DataLab's [R Basics
+  workshop series][r-basics]) is required.
+
+  ::: {.callout-note title="Learning Goals" collapse="true"}
+  After completing this series, learners should be able to:
+
+  * Build and train a classification model on their data.
+  * Use cross-validation to estimate accuracy and tune hyperparameters for
+    classification models.
+  * Identify strategies to improve results from classification models.
+  * Explain the tradeoffs between popular clustering algorithms.
+  * Run a clustering algorithm on their data.
+  :::
+
+[overview-slides]: https://docs.google.com/presentation/d/1hQQVCuGFL5nYssFba1ZK_J-HxGiiRreV9_wx03NlPM4/edit?usp=sharing
+[r-basics]: https://ucdavisdatalab.github.io/workshop_r_basics/
+

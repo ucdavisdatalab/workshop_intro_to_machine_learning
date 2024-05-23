@@ -1,4 +1,5 @@
-# Unsupervised Learning
+Unsupervised Learning
+=====================
 
 Clustering involves identifying groups of similar observations (called
 clusters) within data. Clustering can be an effective tool for finding patterns
@@ -8,9 +9,13 @@ This chapter presents the advantages and disadvantages of several popular
 algorithms for clustering, as well as examples of how to run clustering
 algorithms in R.
 
-::: {.callout-note title="Learning Goals"}
-After this workshop, learners should be able to:
 
-* Explain the tradeoffs between popular clustering algorithms.
-* Run a clustering algorithm on their data.
-:::
+Packages for Unsupervised Learning
+----------------------------------
+
+* [CRAN Task View: Cluster Analysis][cran-cluster]
+* [tidyclust][]
+
+[cran-cluster]: https://cran.r-project.org/view=Cluster
+[tidyclust]: https://tidyclust.tidymodels.org/
+
