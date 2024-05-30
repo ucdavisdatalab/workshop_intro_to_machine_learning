@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -69,6 +103,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -154,7 +217,23 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#packages-for-unsupervised-learning" id="toc-packages-for-unsupervised-learning" class="nav-link active" data-scroll-target="#packages-for-unsupervised-learning"><span class="header-section-number">2.1</span> Packages for Unsupervised Learning</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">2.1</span> Introduction</a></li>
+  <li><a href="#packages" id="toc-packages" class="nav-link" data-scroll-target="#packages"><span class="header-section-number">2.2</span> Packages</a>
+  <ul class="collapse">
+  <li><a href="#dimension-reduction" id="toc-dimension-reduction" class="nav-link" data-scroll-target="#dimension-reduction"><span class="header-section-number">2.2.1</span> Dimension Reduction</a></li>
+  <li><a href="#clustering" id="toc-clustering" class="nav-link" data-scroll-target="#clustering"><span class="header-section-number">2.2.2</span> Clustering</a></li>
+  </ul></li>
+  <li><a href="#dimension-reduction-1" id="toc-dimension-reduction-1" class="nav-link" data-scroll-target="#dimension-reduction-1"><span class="header-section-number">2.3</span> Dimension Reduction</a>
+  <ul class="collapse">
+  <li><a href="#example-penguins-pca" id="toc-example-penguins-pca" class="nav-link" data-scroll-target="#example-penguins-pca"><span class="header-section-number">2.3.1</span> Example: Penguins PCA</a></li>
+  <li><a href="#sec-viz-curse" id="toc-sec-viz-curse" class="nav-link" data-scroll-target="#sec-viz-curse"><span class="header-section-number">2.3.2</span> Example: Visualizing the Curse of Dimensionality</a></li>
+  </ul></li>
+  <li><a href="#clustering-1" id="toc-clustering-1" class="nav-link" data-scroll-target="#clustering-1"><span class="header-section-number">2.4</span> Clustering</a>
+  <ul class="collapse">
+  <li><a href="#sec-kmeans" id="toc-sec-kmeans" class="nav-link" data-scroll-target="#sec-kmeans"><span class="header-section-number">2.4.1</span> Example: Importance of Standardizing</a></li>
+  <li><a href="#example-hdbscan" id="toc-example-hdbscan" class="nav-link" data-scroll-target="#example-hdbscan"><span class="header-section-number">2.4.2</span> Example: HDBSCAN</a></li>
+  </ul></li>
+  <li><a href="#evaluating-clusters" id="toc-evaluating-clusters" class="nav-link" data-scroll-target="#evaluating-clusters"><span class="header-section-number">2.5</span> Evaluating Clusters</a></li>
   </ul>
 </nav>
     </div>
@@ -180,14 +259,745 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Clustering involves identifying groups of similar observations (called clusters) within data. Clustering can be an effective tool for finding patterns and an important part of exploratory data analysis.</p>
-<p>This chapter presents the advantages and disadvantages of several popular algorithms for clustering, as well as examples of how to run clustering algorithms in R.</p>
-<section id="packages-for-unsupervised-learning" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="packages-for-unsupervised-learning"><span class="header-section-number">2.1</span> Packages for Unsupervised Learning</h2>
+<section id="introduction" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">2.1</span> Introduction</h2>
+<p><strong>Unsupervised learning</strong> methods identify or summarize groups or patterns within data. Unlike supervised learning, unsupervised learning methods do not require a training set and do not make predictions.</p>
+<p>Three common problems in unsupervised learning are:</p>
 <ul>
-<li><a href="https://cran.r-project.org/view=Cluster">CRAN Task View: Cluster Analysis</a></li>
-<li><a href="https://tidyclust.tidymodels.org/">tidyclust</a></li>
+<li><strong>Dimension reduction</strong>, where the goal is to reduce the dimensionality (number of features) of a data set while preserving some of the characteristics that distinguish the observations. Some dimension reduction methods rank or select features, while others create an <strong>embedding</strong>, a set of new features computed from the originals.</li>
+<li><strong>Clustering</strong>, where the goal is to identify <strong>clusters</strong>, or groups of similar observations in a data set.</li>
+<li><strong>Anomaly detection</strong>, where the goal is to identify unusual or extreme observations in a data set.</li>
 </ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>It might help to think of dimension reduction and clustering as unsupervised equivalents of regression and classification (<a href="01_supervised.html#sec-supervised-learning" class="quarto-xref"><span>Section 1.1</span></a>), respectively. Dimension reduction creates a numerical summary (an embedding) of each observation, while clustering creates a categorical summary (a cluster label).</p>
+<p>You can also think of dimension reduction and clustering methods as lossy data compression methods.</p>
+</div>
+</div>
+<p>The next section describes packages for unsupervised learning in R. The subsequent sections provide more details about and examples of methods for dimension reduction and clustering. The chapter ends with a discussion of ways to evaluate clusters.</p>
+<!--
+This chapter presents the advantages and disadvantages of several popular
+algorithms for clustering, as well as examples of how to run clustering
+algorithms in R.
+-->
+</section>
+<section id="packages" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="packages"><span class="header-section-number">2.2</span> Packages</h2>
+<section id="dimension-reduction" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="dimension-reduction"><span class="header-section-number">2.2.1</span> Dimension Reduction</h3>
+<p>There’s no CRAN Task View page for dimension reduction. Some dimension reduction packages are:</p>
+<ul>
+<li>Independent Component Analysis (ICA)
+<ul>
+<li><a href="https://cran.r-project.org/web/packages/fastICA/">fastICA</a></li>
+</ul></li>
+<li>Principal Component Analysis (PCA)
+<ul>
+<li>Built-in <code>prcomp</code> (preferred) and <code>princomp</code> functions</li>
+<li><a href="https://cran.r-project.org/web/packages/LearnPCA/">LearnPCA</a> provides vignettes about PCA and details about the differences between <code>prcomp</code> and <code>princomp</code></li>
+<li><a href="https://cran.r-project.org/web/packages/kernlab/">kernlab</a> for kernel PCA (as well as many other kernel-based machine learning methods)</li>
+</ul></li>
+<li>Classical/Metric Multidimensional Scaling (MDS)
+<ul>
+<li>Built-in <code>cmdscale</code> function</li>
+<li><a href="https://cran.r-project.org/web/packages/smacof/">smacof</a></li>
+</ul></li>
+<li>Nonnegative Matrix Factorization (NMF)
+<ul>
+<li><a href="https://cran.r-project.org/web/packages/RcppML/">RcppML</a></li>
+<li><a href="https://cran.r-project.org/web/packages/vegan/">vegan</a></li>
+</ul></li>
+<li>t-Distributed Stochastic neighbor Embedding (t-SNE)
+<ul>
+<li><a href="https://cran.r-project.org/web/packages/tsne/">tsne</a></li>
+</ul></li>
+<li>Uniform Manifold Approximation and Projection (UMAP)
+<ul>
+<li><a href="https://cran.r-project.org/web/packages/umap/">umap</a></li>
+<li><a href="https://cran.r-project.org/web/packages/uwot/">uwot</a></li>
+</ul></li>
+</ul>
+<p>The following packages provide a wider collection of dimension reduction methods:</p>
+<ul>
+<li><a href="https://cran.r-project.org/web/packages/dimRed/">dimRed</a> is a common interface for a variety of dimension reduction methods packages (<a href="https://doi.org/10.32614/RJ-2018-039">the accompanying paper</a> provides an very brief overview of many dimension reduction methods).</li>
+<li><a href="https://recipes.tidymodels.org/">recipes</a> is a <a href="https://www.tidymodels.org/">tidymodels</a> package for preprocessing and feature engineering that provides a common interface for many dimension reduction methods packages.</li>
+<li><a href="https://cran.r-project.org/web/packages/vegan/">vegan</a> is collection of statistical methods popular among community and vegetation ecologists, including some dimension reduction methods.</li>
+</ul>
+</section>
+<section id="clustering" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="clustering"><span class="header-section-number">2.2.2</span> Clustering</h3>
+<p>The <a href="https://cran.r-project.org/view=Cluster">CRAN Task View: Cluster Analysis page</a> is a list of popular, actively-maintained packages for clustering. The list receives regular updates from the CRAN administrators.</p>
+<p>The <a href="https://tidyclust.tidymodels.org/">tidyclust</a> package provides a common interface for a variety of clustering method packages.</p>
+</section>
+</section>
+<section id="dimension-reduction-1" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="dimension-reduction-1"><span class="header-section-number">2.3</span> Dimension Reduction</h2>
+<p>Reasons you might want to use dimension reduction methods on a data set include:</p>
+<ul>
+<li>Many machine learning methods perform poorly when dimensionality is high, especially if it’s high relative to the number of observations.</li>
+<li>Visualizing more than 2 or 3 features at a time is difficult.</li>
+<li>You suspect the data set has a few informative features hidden among many uninformative ones.</li>
+<li>Computing costs (time and money) tend to increase with data set size.</li>
+</ul>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>High-dimensional data sets are a problem for many machine learning methods because:</p>
+<ol type="1">
+<li>Sparsity increases with dimensionality, because volume increases with dimensionality. In other words, as the number of features in a data set increases, distances between the observations increase. This effect is known as <strong>the curse of dimensionality</strong>.</li>
+<li>The number of parameters to estimate typically increases with dimensionality. For instance, in a linear model, there’s a coefficient for each included feature.</li>
+</ol>
+<p>A few methods, such as regularized linear models and random forest models, are robust by design when faced with high-dimensional data. These methods usually have some sort of built-in dimension reduction.</p>
+<p><a href="#sec-viz-curse" class="quarto-xref"><span>Section 2.3.2</span></a> provides more details about the curse of dimensionality.</p>
+</div>
+</div>
+<p>Different dimension reduction methods preserve different characteristics of data and have different use cases: there’s no one-size-fits-all method. When selecting a method, think about what your goals and priorities are. Do you want to plot the data? Do you want to use the data for supervised learning? Do the data need to fit in a fixed amount of memory? Are the features numerical, categorical, or a mix of both? Thinking through these details will help guide you to an appropriate method. <a href="https://doi.org/10.1371/journal.pcbi.1006907">Nguyen and Holmes (2019)</a> provide a concise overview of things to consider when using dimension reduction methods.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If you plan to use your data set for supervised learning, it’s usually best to choose a supervised learning model with some kind of dimension reduction built-in. These models optimize for predicting the response, whereas unsupervised dimension reduction methods do not. Some examples include:</p>
+<ul>
+<li>Regularized regression (LASSO, Elastic Net, …)</li>
+<li>Partial least squares regression</li>
+<li>Supervised principal components analysis</li>
+<li>Random forest models</li>
+</ul>
+</div>
+</div>
+<p>Dimension reduction methods always change some of the relationships between observations. Typically, there’s a tradeoff between preserving <strong>global structure</strong>, the relationships between all observations, and <strong>local structure</strong>, the relationships between nearby observations. See <a href="https://datascience.stackexchange.com/questions/109276/what-is-the-meaning-of-preserving-local-or-global-structure-of-the-data">this StackOverflow post</a> for an example and visualization of this tradeoff.</p>
+<p>Here’s a list of a few well-known dimension reduction methods, where 🌐 denotes methods that tend to preserve global structure while 🏘️ denotes methods that tend to preserve local structure:</p>
+<ul>
+<li>🌐 Principal Component Analysis (PCA)
+<ul>
+<li>Identifies perpendicular axes of greatest variance (the “principal components”) and rotates feature space to these axes</li>
+<li>Difficult to interpret in most cases</li>
+<li>Creates linear combinations of the original features; kernel PCA (kPCA) generalizes to non-linear combinations</li>
+</ul></li>
+<li>🌐 Nonnegative Matrix Factorization (NMF)
+<ul>
+<li>Like PCA, but limited to nonnegative data and produces nonnegative components</li>
+<li>Easy to interpret in some cases</li>
+</ul></li>
+<li>🏘️ Isomap
+<ul>
+<li>Assumes observations are on a low-dimensional manifold and preserves distances on the manifold (geodesic distances)</li>
+</ul></li>
+<li>🏘️ t-Distributed Stochastic Neighbor Embedding (t-SNE) (<a href="https://distill.pub/2016/misread-tsne/">guide</a>)
+<ul>
+<li>Non-deterministic method to preserve local structure</li>
+<li>Mainly used for visualizations</li>
+</ul></li>
+<li>🏘️ Uniform Manifold Approximation and Projection (UMAP)
+<ul>
+<li>Like t-SNE</li>
+<li>Mainly used for visualizations, although the creators claim it is broadly applicable</li>
+</ul></li>
+</ul>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Most dimension reduction methods are sensitive to the scales of features, and some also require that features have mean 0. It’s usually a good idea to <strong>standardize</strong> each feature before dimension reduction, by subtracting the mean and dividing by the standard deviation. In R, you can use the <code>scale</code> function to do this.</p>
+</div>
+</div>
+<section id="example-penguins-pca" class="level3" data-number="2.3.1">
+<h3 data-number="2.3.1" class="anchored" data-anchor-id="example-penguins-pca"><span class="header-section-number">2.3.1</span> Example: Penguins PCA</h3>
+<p>Let’s try out principal components analysis on the Palmer Penguins data set from <a href="01_supervised.html#sec-penguins" class="quarto-xref"><span>Section 1.2.1</span></a>. Start by loading the data, removing the observations with missing values, and selecting the numerical features:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"palmerpenguins"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>peng <span class="ot">=</span> <span class="fu">na.omit</span>(penguins)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Columns to transform with PCA.</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"bill_length_mm"</span>, <span class="st">"bill_depth_mm"</span>, <span class="st">"flipper_length_mm"</span>, <span class="st">"body_mass_g"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> peng[cols]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s run PCA with R’s built-in <code>prcomp</code> function first. The function has parameters <code>center</code> and <code>scale.</code> to control whether the features are centered and scaled first. PCA is intended for centered data, so you should always center the data (and this is the default). Whether you should scale the data depends on how different the scales of your features are, but it’s usually a good idea if you’re not sure. Scaling features makes them harder to interpret, but PCA is generally hard to interpret anyways. Run PCA:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>pca <span class="ot">=</span> <span class="fu">prcomp</span>(x, <span class="at">center =</span> <span class="cn">TRUE</span>, <span class="at">scale. =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>pca</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Standard deviations (1, .., p=4):
+[1] 1.6569115 0.8821095 0.6071594 0.3284579
+
+Rotation (n x k) = (4 x 4):
+                         PC1         PC2        PC3        PC4
+bill_length_mm     0.4537532 -0.60019490 -0.6424951  0.1451695
+bill_depth_mm     -0.3990472 -0.79616951  0.4258004 -0.1599044
+flipper_length_mm  0.5768250 -0.00578817  0.2360952 -0.7819837
+body_mass_g        0.5496747 -0.07646366  0.5917374  0.5846861</code></pre>
+</div>
+</div>
+<p>You can think of the standard deviations as a measure of information in along each principal component. The principal components are always sorted from highest to lowest standard deviation.</p>
+<p>Each principal component is a linear combination of the features. The columns of the rotation matrix show the coefficients for the features in these linear combinations.</p>
+<p>You can use the <code>predict</code> function to compute the PCA embeddings for a data set. By default, <code>prcomp</code> computes these automatically for the original data set, so in this case you can get the embeddings with either <code>pca$retx</code> or <code>predict</code>. Let’s get the embeddings with <code>predict</code> and plot the first two principal components:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Rotate the features to the principal components.</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>embeddings <span class="ot">=</span> <span class="fu">predict</span>(pca, x)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>embeddings <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">species =</span> peng<span class="sc">$</span>species, embeddings)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"ggplot2"</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(embeddings) <span class="sc">+</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2, <span class="at">color =</span> species, <span class="at">shape =</span> species) <span class="sc">+</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_unsupervised_files/figure-html/ex01_pc_plot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The plot shows that the principal components separate the Gentoo penguins, but there’s still some overlap between the other species. PCA is not designed to separate classes (and is not even aware of the classes), so this result isn’t surprising. Instead, PCA tries to represent variation in the data set efficiently. For instance, the first and second principal components often capture a substantial percentage of the overall variation.</p>
+<p>It’s common to make another plot, called a <strong>scree plot</strong>, to visualize how well principal components account for variation. Specifically, a scree plot shows the percentage of total variance accounted for by each principal component. The <code>prcomp</code> function returns standard deviations principal components, which you can square to compute variances. The code to make a scree plot is:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>scree <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">pc =</span> <span class="fu">seq_along</span>(pca<span class="sc">$</span>sdev), <span class="at">var =</span> pca<span class="sc">$</span>sdev<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute percentage of variance explained.</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>scree<span class="sc">$</span>pct_var <span class="ot">=</span> scree<span class="sc">$</span>var <span class="sc">/</span> <span class="fu">sum</span>(scree<span class="sc">$</span>var)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(scree) <span class="sc">+</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> pc, <span class="at">y =</span> pct_var) <span class="sc">+</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Principal Component"</span>, <span class="at">y =</span> <span class="st">"Percentage of Variance Explained"</span>) <span class="sc">+</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_unsupervised_files/figure-html/ex01_scree_plot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The scree plot shows that the first and second prinicpal component account for almost 90% (70% + 20%) of the variance in the four features. When you use PCA for dimension reduction, you can use a scree plot to decide how many principal components to keep. A common approach is to look for an “elbow” in the plot where keeping additional components provides a relatively small increase in percentage of variance accounted for.</p>
+<p>Now let’s run PCA with the recipes package. The package is designed around the idea of writing “recipes” for data analysis, which can include preprocessing, feature engineering, modeling, and more. Recipes always begin with a call to the <code>recipe</code> function, which takes a training data set as an argument. Then you can add (via the pipe operator <code>%&gt;%</code>) any number of <code>step_</code> functions, which correspond to individual steps in the analysis. For PCA, you can use <code>step_normalize</code> (to center and scale) and <code>step_pca</code>. Next, the <code>prep</code> function runs the recipe. Finally, the <code>juice</code> and <code>bake</code> functions extract the result of a recipe on the training set or a new data set, respectively. Putting all of these ideas together, the code is:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("recipes")</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"recipes"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>embeddings_tidy <span class="ot">=</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(peng) <span class="sc">%&gt;%</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_of</span>(cols)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_pca</span>(<span class="fu">all_of</span>(cols)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prep</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">juice</span>()</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(embeddings_tidy) <span class="sc">+</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2, <span class="at">color =</span> species, <span class="at">shape =</span> species) <span class="sc">+</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_unsupervised_files/figure-html/ex01_recipes-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The plot shows the same result as before. As of writing, the recipes package doesn’t appear to provide a convenient way to get diagnostic information about PCA or make a scree plot.</p>
+</section>
+<section id="sec-viz-curse" class="level3" data-number="2.3.2">
+<h3 data-number="2.3.2" class="anchored" data-anchor-id="sec-viz-curse"><span class="header-section-number">2.3.2</span> Example: Visualizing the Curse of Dimensionality</h3>
+<p>Another way to think about the curse of dimensionality is in terms of where most of the volume is in a <span class="math inline">\(d\)</span>-dimensional ball. As <span class="math inline">\(d\)</span> increases, the fraction of volume near the surface of the ball increases. In this example, we’ll visualize the relationship between dimensionality <span class="math inline">\(d\)</span> and the fraction of volume near the surface of a ball.</p>
+<p>In general, the volume of a <span class="math inline">\(d\)</span>-dimensional ball with radius <span class="math inline">\(r\)</span> is:</p>
+<p><span class="math display">\[
+V_d(r) = C_d \cdot r^d
+\]</span></p>
+<p>Where <span class="math inline">\(C_d\)</span> is a constant that depends on the dimensionality. For example, the volumes of a circle and a sphere are respectively:</p>
+<p><span class="math display">\[
+\begin{aligned}
+V_2(r) &amp;= \pi \cdot r^2
+\\
+V_3(r) &amp;= \frac{4}{3} \pi \cdot r^3
+\end{aligned}
+\]</span></p>
+<p>For a ball with radius <span class="math inline">\(r = 1\)</span>, the volume is just <span class="math inline">\(V_d(1) = C_d\)</span>. Now consider a ball with radius <span class="math inline">\(r = 1 - \epsilon\)</span>. The volume is:</p>
+<p><span class="math display">\[
+V_d(1 - \epsilon) = C_d \cdot (1 - \epsilon)^d
+\]</span></p>
+<p>Subtracting a <span class="math inline">\((1 - \epsilon)\)</span>-ball from a 1-ball gives a shell at the surface of the 1-ball with thickness <span class="math inline">\(\epsilon\)</span>. You can also find the volume of this <span class="math inline">\(\epsilon\)</span>-shell by subtracting the respective volumes. So the fraction of the 1-ball’s volume made up of the <span class="math inline">\(\epsilon\)</span>-shell is:</p>
+<p><span class="math display">\[
+\frac{V_d(1) - V_d(1 - \epsilon)}{V_d(1)}
+=
+\frac{C_d - C_d \cdot (1 - \epsilon)^d}{C_d}
+=
+1 - (1 - \epsilon)^d
+\]</span></p>
+<p>You can use R to plot this quantity for different values of <span class="math inline">\(\epsilon\)</span> and <span class="math inline">\(d\)</span>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"ggplot2"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Set aspect ratio to 1.</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_fixed</span>() <span class="sc">+</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="dv">0</span>, <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Shell Thickness"</span>, <span class="at">y =</span> <span class="st">"Fraction of Volume"</span>) <span class="sc">+</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_discrete</span>(<span class="st">"Dimensions"</span>, <span class="at">breaks =</span> <span class="fu">c</span>(<span class="st">"2"</span>, <span class="st">"3"</span>, <span class="st">"10"</span>, <span class="st">"20"</span>)) <span class="sc">+</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_discrete</span>(<span class="st">"Dimensions"</span>, <span class="at">breaks =</span> <span class="fu">c</span>(<span class="st">"2"</span>, <span class="st">"3"</span>, <span class="st">"10"</span>, <span class="st">"20"</span>)) <span class="sc">+</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Functions to plot.</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_function</span>(</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">fun =</span> \(x) <span class="dv">1</span> <span class="sc">-</span> (<span class="dv">1</span> <span class="sc">-</span> x)<span class="sc">^</span><span class="dv">2</span>, <span class="fu">aes</span>(<span class="at">color =</span> <span class="st">"2"</span>, <span class="at">linetype =</span> <span class="st">"2"</span>)) <span class="sc">+</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_function</span>(</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">fun =</span> \(x) <span class="dv">1</span> <span class="sc">-</span> (<span class="dv">1</span> <span class="sc">-</span> x)<span class="sc">^</span><span class="dv">3</span>, <span class="fu">aes</span>(<span class="at">color =</span> <span class="st">"3"</span>, <span class="at">linetype =</span> <span class="st">"3"</span>)) <span class="sc">+</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_function</span>(</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">fun =</span> \(x) <span class="dv">1</span> <span class="sc">-</span> (<span class="dv">1</span> <span class="sc">-</span> x)<span class="sc">^</span><span class="dv">10</span>, <span class="fu">aes</span>(<span class="at">color =</span> <span class="st">"10"</span>, <span class="at">linetype =</span> <span class="st">"10"</span>)) <span class="sc">+</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_function</span>(</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">fun =</span> \(x) <span class="dv">1</span> <span class="sc">-</span> (<span class="dv">1</span> <span class="sc">-</span> x)<span class="sc">^</span><span class="dv">20</span>, <span class="fu">aes</span>(<span class="at">color =</span> <span class="st">"20"</span>, <span class="at">linetype =</span> <span class="st">"20"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_unsupervised_files/figure-html/ex02_plot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The plot shows that as <span class="math inline">\(d\)</span> increases, the fraction of volume near the surface of the 1-ball increases. For instance, at <span class="math inline">\(d = 20\)</span>, almost 100% of the volume is within 0.25 of the ball’s surface.</p>
+<p>This example is based on one in Section 1.4 of <a href="https://link.springer.com/book/10.1007/978-0-387-45528-0">Pattern Recognition and Machine Learning</a>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Section 2.5 of <a href="https://hastie.su.domains/ElemStatLearn/">The Elements of Statistical Learning</a> provides a different perspective on the curse of dimensionality.</p>
+<p>To learn even more about the counterintuitive properties of high-dimensional spaces, watch <a href="https://www.youtube.com/watch?v=zwAD6dRSVyI">Thinking Outside the 10-Dimensional Box</a> by 3Blue1Brown.</p>
+</div>
+</div>
+<!--
+### Example: Image Data
+
+
+### Example: Text Data
+-->
+</section>
+</section>
+<section id="clustering-1" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="clustering-1"><span class="header-section-number">2.4</span> Clustering</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../figures/scikit_learn_clustering.png" class="img-fluid figure-img"></p>
+<figcaption>Results from 11 different clustering methods across different 6 data sets. Clustered points are blue, orange, green, or pink, while unclustered/noise points are black. Visualization from <a href="https://scikit-learn.org/stable/auto_examples/cluster/plot_cluster_comparison.html">the scikit-learn User Guide</a>.</figcaption>
+</figure>
+</div>
+<p>Clustering methods identify groups or clusters of similar observations within a data set. From an exploratory data analysis perspective, clusters provide insight into subpopulations, which might merit individual investigation or followup confirmatory work. Some clustering methods can also detect noise or outlying observations. From a classification perspective, clusters can sometimes be used as approximate classes, to speed up the process of creating an annotated training set.</p>
+<p>As with dimension reduction methods, different clustering methods emphasize different characteristics of data. In particular, they measure similarity between observations in different ways. Here’s a list of some well-known families of clustering methods, where ✨ indicates a good starting point for many problems:</p>
+<ul>
+<li>✨ Density-based clustering
+<ul>
+<li>These methods estimate density of observations and treat contiguous high-density regions as clusters.</li>
+<li>Takeaways: Easy to explain the intuition, but many technical details. No assumptions about cluster size or shape. Can identify noise observations. Computational cost scales well.</li>
+<li>Methods:
+<ul>
+<li>DBSCAN (<a href="https://www.naftaliharris.com/blog/visualizing-dbscan-clustering/">demo</a>)</li>
+<li>OPTICS</li>
+<li>HDBSCAN (<a href="https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html">guide</a>)</li>
+</ul></li>
+</ul></li>
+<li>✨ Hierarchical clustering
+<ul>
+<li>These methods form a hierarchy of clusters by repeatedly combining or splitting initial clusters. Clusters are selected to combine or split based on how they affect dissimilarity, which is measured with a linkage function. A variety of linkage functions can be used, and the choice of linkage function has a substantial impact on the resulting clusters (see <a href="https://stats.stackexchange.com/questions/195446/choosing-the-right-linkage-method-for-hierarchical-clustering">this page</a>).</li>
+<li>Takeaways: The hierachy of clusters can be visualized with a dendogram, and can be “cut” at various levels to produce coarser or finer clusters. Different linkage functions provide specific effects. Doesn’t identify noise observations. Computational cost scales well.</li>
+<li>Methods:
+<ul>
+<li>Agglomerative clustering (<a href="https://allisonhorst.com/agglomerative-hierarchical-clustering">guide</a>)</li>
+<li>Divisive clustering</li>
+</ul></li>
+</ul></li>
+<li>Model-based clustering
+<ul>
+<li>These methods assume observations are generated from a specific probability distribution, estimate the parameters of the distribution, and predict the most likely cluster labels.</li>
+<li>Takeaways: A good choice if you have knowledge about the probability distribution of your data. Gaussian models, which are the most common, find ellipsoid clusters. The number of clusters needs to be specified in advance. Can be used for fuzzy clustering, since the result for each observation is a set of cluster probabilities rather than a label.</li>
+<li>Methods:
+<ul>
+<li>Mixture models, which can be fitted with the expectation-maximization algorithm or Bayesian methods</li>
+</ul></li>
+</ul></li>
+<li>Partitioning clustering
+<ul>
+<li>These methods partition a data set into evenly-sized clusters based on distances between observations and cluster centroids.</li>
+<li>Takeaways: Easy to explain. Clusters are evenly-sized. The number of clusters needs to be specified in advance, although there are ways to estimate the number of clusters. Doesn’t identify noise observations. Computational cost scales well.</li>
+<li>Methods:
+<ul>
+<li><span class="math inline">\(k\)</span>-means (<a href="https://allisonhorst.com/k-means-clustering">guide</a>, <a href="https://hckr.pl/k-means-visualization/">demo</a>)</li>
+<li><span class="math inline">\(k\)</span>-medoids, or partitioning around means (PAM)</li>
+<li>Mini-Batch <span class="math inline">\(k\)</span>-means</li>
+</ul></li>
+</ul></li>
+</ul>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Like dimension reduction methods, most clustering methods are sensitive to the scales of features. So you should generally standardize each feature before clustering.</p>
+</div>
+</div>
+<section id="sec-kmeans" class="level3" data-number="2.4.1">
+<h3 data-number="2.4.1" class="anchored" data-anchor-id="sec-kmeans"><span class="header-section-number">2.4.1</span> Example: Importance of Standardizing</h3>
+<p>To demonstrate the importance of standardizing features before clustering, let’s run <span class="math inline">\(k\)</span>-means clustering on the Palmer Penguins data set before and after standardizing. We’ll use the tidyclust package to do the clustering. The package is designed to have an interface similar to parsnip (see <a href="01_supervised.html#sec-penguins" class="quarto-xref"><span>Section 1.2.1</span></a>). Here’s the code to initialize <span class="math inline">\(k\)</span>-means clustering and specify the features to consider:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("tidyclust")</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tidyclust"</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>km <span class="ot">=</span> <span class="fu">k_means</span>(<span class="at">num_clusters =</span> <span class="dv">3</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>form <span class="ot">=</span> <span class="er">~</span> bill_length_mm <span class="sc">+</span> bill_depth_mm <span class="sc">+</span> flipper_length_mm <span class="sc">+</span> body_mass_g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now “fit” the <span class="math inline">\(k\)</span>-means clusters. Since we know there are 3 penguin species, let’s request 3 clusters:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fitted <span class="ot">=</span> <span class="fu">fit</span>(km, form, peng)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>fitted</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tidyclust cluster object
+
+K-means clustering with 3 clusters of sizes 140, 113, 80
+
+Cluster means:
+  bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+1       41.12214      17.94643          189.6286    3461.250
+3       44.24336      17.44779          201.5487    4310.619
+2       48.66250      15.39750          219.9875    5365.938
+
+Clustering vector:
+  1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20 
+  1   1   1   1   1   1   2   1   1   2   1   1   2   1   2   1   1   1   2   1 
+ 21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  38  39  40 
+  1   1   1   1   2   1   2   1   2   1   2   2   1   1   2   1   2   1   2   1 
+ 41  42  43  44  45  46  47  48  49  50  51  52  53  54  55  56  57  58  59  60 
+  2   1   1   2   1   2   1   2   1   1   1   1   1   1   1   2   1   2   1   2 
+ 61  62  63  64  65  66  67  68  69  70  71  72  73  74  75  76  77  78  79  80 
+  1   2   1   2   1   2   1   2   1   2   1   2   1   2   1   2   1   2   1   1 
+ 81  82  83  84  85  86  87  88  89  90  91  92  93  94  95  96  97  98  99 100 
+  1   1   2   1   1   2   1   2   1   2   1   2   1   2   1   2   1   2   1   1 
+101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 
+  1   2   1   2   1   2   1   2   2   2   1   1   1   1   1   1   1   1   1   2 
+121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 
+  1   2   1   2   1   1   1   2   1   2   1   2   1   2   1   1   1   1   1   1 
+141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 
+  2   1   1   1   1   2   2   3   2   3   3   2   2   3   2   3   2   3   2   3 
+161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 
+  2   3   2   3   2   3   3   3   2   3   3   3   3   2   3   3   2   3   3   3 
+181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 
+  3   3   3   2   3   2   3   2   2   3   3   2   3   3   3   3   3   2   3   3 
+201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 
+  3   2   3   2   3   2   3   2   3   2   3   3   2   3   2   3   3   3   2   3 
+221 222 223 224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240 
+  2   3   2   3   2   3   2   3   2   3   2   3   3   3   3   3   2   3   3   3 
+241 242 243 244 245 246 247 248 249 250 251 252 253 254 255 256 257 258 259 260 
+  3   3   2   3   3   3   3   3   3   2   3   2   3   3   3   2   3   2   3   3 
+261 262 263 264 265 266 267 268 269 270 271 272 273 274 275 276 277 278 279 280 
+  3   3   3   3   3   1   2   1   1   1   2   1   1   2   1   1   1   1   2   1 
+281 282 283 284 285 286 287 288 289 290 291 292 293 294 295 296 297 298 299 300 
+  2   1   1   1   2   1   1   1   1   1   2   1   1   1   2   1   2   1   2   1 
+301 302 303 304 305 306 307 308 309 310 311 312 313 314 315 316 317 318 319 320 
+  2   1   2   1   2   2   1   1   1   1   2   1   2   1   1   1   2   1   2   1 
+321 322 323 324 325 326 327 328 329 330 331 332 333 
+  1   1   2   1   1   2   1   1   2   1   1   2   1 
+
+Within cluster sum of squares by cluster:
+[1] 9724809 9318036 9718829
+ (between_SS / total_SS =  86.6 %)
+
+Available components:
+
+[1] "cluster"      "centers"      "totss"        "withinss"     "tot.withinss"
+[6] "betweenss"    "size"         "iter"         "ifault"      </code></pre>
+</div>
+</div>
+<p>Printing the <code>fitted</code> object shows the cluster means as well as the ratio of the between-cluster sum of squared errors (BSS) to total sum of squared errors (TSS). The ratio provides one indication of how well the clusters fit the data; larger values are better.</p>
+<p>Let’s make a plot of the clusters against <code>bill_length_mm</code> and <code>body_mass_g</code>. You can get the cluster labels for the observations with the <code>extract_cluster_assignment</code> function. The result is a data frame with the cluster labels in the <code>.cluster</code> column. Here’s the code to make the plot:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>clust <span class="ot">=</span> <span class="fu">extract_cluster_assignment</span>(fitted)<span class="sc">$</span>.cluster</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(peng) <span class="sc">+</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">shape =</span> clust, <span class="at">color =</span> clust) <span class="sc">+</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(species))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_unsupervised_files/figure-html/ex05_unstd_plot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The identified clusters don’t match up well with the penguin species. While this could just mean that the features don’t differentiate the species, in this case something else is at play. Notice that along the y-axis, the clusters fall into three distinct bands. This is a sign that <code>body_mass_g</code>, the feature on the y-axis, dominates the distances used to compute the clusters. In other words, these features have wildly different scales. You can see this by computing the standard deviations of the features:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarize</span>(peng, <span class="fu">across</span>(bill_length_mm<span class="sc">:</span>body_mass_g, sd))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 4
+  bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+           &lt;dbl&gt;         &lt;dbl&gt;             &lt;dbl&gt;       &lt;dbl&gt;
+1           5.47          1.97              14.0        805.</code></pre>
+</div>
+</div>
+<p>The values of <code>body_mass_g</code> are much more spread out than the values of the other features.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>peng_scaled <span class="ot">=</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(peng,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(bill_length_mm<span class="sc">:</span>body_mass_g, \(x) <span class="fu">scale</span>(x)[, <span class="dv">1</span>])</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>fitted <span class="ot">=</span> <span class="fu">fit</span>(km, form, peng_scaled)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>fitted</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tidyclust cluster object
+
+K-means clustering with 3 clusters of sizes 129, 85, 119
+
+Cluster means:
+  bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+3     -1.0452359     0.4858944        -0.8803701  -0.7616078
+2      0.6710153     0.8040534        -0.2889118  -0.3835267
+1      0.6537742    -1.1010497         1.1607163   1.0995561
+
+Clustering vector:
+  1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20 
+  1   1   1   1   1   1   1   1   1   1   1   1   2   1   2   1   1   1   1   1 
+ 21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  38  39  40 
+  1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   2   1 
+ 41  42  43  44  45  46  47  48  49  50  51  52  53  54  55  56  57  58  59  60 
+  1   1   1   2   1   1   1   2   1   1   1   1   1   1   1   2   1   1   1   1 
+ 61  62  63  64  65  66  67  68  69  70  71  72  73  74  75  76  77  78  79  80 
+  1   1   1   2   1   1   1   2   1   2   1   1   1   2   1   2   1   1   1   1 
+ 81  82  83  84  85  86  87  88  89  90  91  92  93  94  95  96  97  98  99 100 
+  1   1   1   1   1   2   1   1   1   2   1   1   1   2   1   2   1   1   1   1 
+101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 
+  1   1   1   2   1   2   1   2   1   2   1   1   1   1   1   1   1   1   1   1 
+121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 
+  1   1   1   2   1   2   1   1   1   1   1   1   1   1   1   1   1   1   1   1 
+141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 
+  1   1   1   1   1   2   3   3   3   3   3   3   3   3   3   3   3   3   3   3 
+161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 
+  3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3 
+181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 
+  3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3 
+201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 
+  3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3 
+221 222 223 224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240 
+  3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3 
+241 242 243 244 245 246 247 248 249 250 251 252 253 254 255 256 257 258 259 260 
+  3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3 
+261 262 263 264 265 266 267 268 269 270 271 272 273 274 275 276 277 278 279 280 
+  3   3   3   3   3   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2 
+281 282 283 284 285 286 287 288 289 290 291 292 293 294 295 296 297 298 299 300 
+  2   2   2   2   2   1   2   1   2   2   2   2   2   2   2   1   2   1   2   2 
+301 302 303 304 305 306 307 308 309 310 311 312 313 314 315 316 317 318 319 320 
+  2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   1 
+321 322 323 324 325 326 327 328 329 330 331 332 333 
+  2   2   2   2   2   2   2   2   2   2   2   2   2 
+
+Within cluster sum of squares by cluster:
+[1] 120.7030 109.4813 139.4684
+ (between_SS / total_SS =  72.2 %)
+
+Available components:
+
+[1] "cluster"      "centers"      "totss"        "withinss"     "tot.withinss"
+[6] "betweenss"    "size"         "iter"         "ifault"      </code></pre>
+</div>
+</div>
+<p>Notice that the BSS to TSS ratio decreased by about 14%.</p>
+<p>Let’s plot the clusters the same way as before:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>clust <span class="ot">=</span> <span class="fu">extract_cluster_assignment</span>(fitted)<span class="sc">$</span>.cluster</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(peng) <span class="sc">+</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">shape =</span> clust, <span class="at">color =</span> clust) <span class="sc">+</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(species))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_unsupervised_files/figure-html/ex05_std_plot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Now the clusters appear to correspond to the penguin species much better than before. Because all of the features have the same scale, they contribute equally to the distances <span class="math inline">\(k\)</span>-means computes, and all of them help to identify the clusters.</p>
+<p>Interestingly, the BSS to TSS ratio is worse even though we know these clusters correspond better to the subpopulations in the data set. This demonstrates that there is no single best metric for cluster quality.</p>
+</section>
+<section id="example-hdbscan" class="level3" data-number="2.4.2">
+<h3 data-number="2.4.2" class="anchored" data-anchor-id="example-hdbscan"><span class="header-section-number">2.4.2</span> Example: HDBSCAN</h3>
+<p>HDBSCAN is an excellent starting point for clustering data if you suspect the clusters have irregular shapes, because it doesn’t make any shape assumptions. In this example, let’s run HDBSCAN on two different data sets.</p>
+<p>First, let’s try HDBSCAN on the Palmer Penguins data set, in order to compare the results to the example in <a href="#sec-kmeans" class="quarto-xref"><span>Section 2.4.1</span></a>. We’ll use the dbscan package, since tidyclust doesn’t support HDBSCAN yet.</p>
+<p>HDBSCAN only has one required hyperparameter: the minimum cluster size. For the penguins data, let’s set this at 20.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><a href="https://hdbscan.readthedocs.io/en/latest/parameter_selection.html">This page</a> provides some advice about how to choose the minimum cluster size.</p>
+</div>
+</div>
+<p>Here’s the code to standardize the features and run HDBSCAN:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("dbscan")</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"dbscan"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dbscan'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:stats':
+
+    as.dendrogram</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">scale</span>(peng[cols])</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>fitted <span class="ot">=</span> <span class="fu">hdbscan</span>(x, <span class="dv">20</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>fitted</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>HDBSCAN clustering for 333 objects.
+Parameters: minPts = 20
+The clustering contains 2 cluster(s) and 4 noise points.
+
+  0   1   2 
+  4 118 211 
+
+Available fields: cluster, minPts, coredist, cluster_scores,
+                  membership_prob, outlier_scores, hc</code></pre>
+</div>
+</div>
+<p>The cluster label <code>0</code> denotes noise. For this data set, HDBSCAN found 2 clusters, even though there are 3 species. One possible explanation is that the species have substantial overlap in some of the features. Density-based methods such as HDBSCAN have trouble with overlap if the density of observations remains high.</p>
+<p>Let’s plot the clusters:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>clust <span class="ot">=</span> <span class="fu">factor</span>(fitted<span class="sc">$</span>cluster)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(peng) <span class="sc">+</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">shape =</span> clust, <span class="at">color =</span> clust) <span class="sc">+</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(species))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_unsupervised_files/figure-html/ex06_hdbscan-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Based on the plot, HDBSCAN clustered the Adélie and Chinstrap penguins together.</p>
+<p>The “H” in “HDBSCAN” stands for “hierarchical,” because HDBSCAN actually computes a hierarchy of clusters. You can view this hierarchy as a dendogram by plotting the <code>hc</code> element of the fitted clusters with <code>plot</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fitted<span class="sc">$</span>hc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_unsupervised_files/figure-html/ex06_dendogram-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>For this data, HDBSCAN doesn’t find many interesting intermediate clusters: it goes directly from individual observations as clusters to two relatively large clusters. Nevertheless, if you want to get the cluster assignments at any given height in the dendogram, you can use the <code>cutree</code> function to do so. Here’s how to get the cluster assignments at height 1.4:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cutree</span>(fitted<span class="sc">$</span>hc, <span class="at">h =</span> <span class="fl">1.4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  [1] 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [38] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [75] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[112] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 3 3
+[149] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3 3 3 3 3 3
+[186] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+[223] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+[260] 3 3 3 3 3 3 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 5 1 1 1 1 1 1 1 1 1 1 1 1 1
+[297] 1 1 1 1 1 1 6 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You can also use the <code>cutree</code> function with results from R’s built-in hierarchical clustering functions.</p>
+</div>
+</div>
+<p>HDBSCAN is worse at clustering the penguin species than <span class="math inline">\(k\)</span>-means. Now let’s consider another data set where HDBSCAN is better at clustering than <span class="math inline">\(k\)</span>-means. The DS3 data set, which is included in the dbscan package, consists of 8,000 observations arranged into 6 visually-distinct shapes and some noise. Here’s what the data set looks like:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"DS3"</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(DS3) <span class="sc">+</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> X, <span class="at">y =</span> Y) <span class="sc">+</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_unsupervised_files/figure-html/ex06_ds3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>fitted <span class="ot">=</span> <span class="fu">hdbscan</span>(DS3, <span class="dv">20</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>clust <span class="ot">=</span> <span class="fu">factor</span>(fitted<span class="sc">$</span>cluster)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(DS3) <span class="sc">+</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> X, <span class="at">y =</span> Y, <span class="at">color =</span> clust) <span class="sc">+</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02_unsupervised_files/figure-html/ex06_ds3_hdbscan-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>For the DS3 data, HDBSCAN succesfully clusters each of the shapes. Try running <span class="math inline">\(k\)</span>-means clustering on the DS3 data with <span class="math inline">\(k = 6\)</span> to see how well it does!</p>
+</section>
+</section>
+<section id="evaluating-clusters" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="evaluating-clusters"><span class="header-section-number">2.5</span> Evaluating Clusters</h2>
+<p>Just as different clustering methods use different measures of (dis)similarity, there are many different ways to evaluate whether clusters are “good”. Two of these are:</p>
+<ul>
+<li>Ratios of sums of squared error (as discussed in <a href="#sec-kmeans" class="quarto-xref"><span>Section 2.4.1</span></a>)</li>
+<li>Silhouette scores</li>
+</ul>
+<p><a href="https://doi.org/10.48550/arXiv.1503.02059">This paper</a> provides a brief discussion of ways to evaluate clusters, while <a href="https://www.routledge.com/Handbook-of-Cluster-Analysis/Hennig-Meila-Murtagh-Rocci/p/book/9780367570408">the book it’s from</a> provides more details. The scikit-learn User Guide also has <a href="https://scikit-learn.org/stable/modules/clustering.html#clustering-performance-evaluation">a section that describes many different evaluation metrics</a>. The best way to evaluate cluster assignments is often to carry out exploratory data analysis to investigate whether they match what you know about (and see in) the data.</p>
 
 
 </section>

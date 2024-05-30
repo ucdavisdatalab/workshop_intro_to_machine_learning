@@ -217,7 +217,7 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1.1</span> Introduction</a></li>
+  <li><a href="#sec-supervised-learning" id="toc-sec-supervised-learning" class="nav-link active" data-scroll-target="#sec-supervised-learning"><span class="header-section-number">1.1</span> Introduction</a></li>
   <li><a href="#packages" id="toc-packages" class="nav-link" data-scroll-target="#packages"><span class="header-section-number">1.2</span> Packages</a>
   <ul class="collapse">
   <li><a href="#sec-penguins" id="toc-sec-penguins" class="nav-link" data-scroll-target="#sec-penguins"><span class="header-section-number">1.2.1</span> Example: Classifying Penguins</a></li>
@@ -258,8 +258,8 @@ window.Quarto = {
 </header>
 
 
-<section id="introduction" class="level2" data-number="1.1">
-<h2 data-number="1.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1.1</span> Introduction</h2>
+<section id="sec-supervised-learning" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="sec-supervised-learning"><span class="header-section-number">1.1</span> Introduction</h2>
 <p><strong>Supervised learning</strong> methods learn from training data in order to make predictions about new data.</p>
 <p>Before going further, let’s review some necessary vocabulary:</p>
 <ul>
@@ -267,6 +267,7 @@ window.Quarto = {
 <li>An <strong>observation</strong> is all measurements for a single unit. Observations are sometimes also called cases.</li>
 <li>A <strong>feature</strong> is a single measurement across all units. Features are sometimes also called variables, covariates, or predictors.</li>
 <li>A <strong>response</strong> is a feature that you want to predict.</li>
+<li>The <strong>dimensionality</strong> of a data set is the number of features.</li>
 </ul>
 <p>For example, suppose you’ve collected a data set with the age, height, and species of every tree in your neighborhood. Each tree is a unit. Each (age, height, species) measurement for a tree is an observation. The features are age, height, and species. If you want to use supervised learning to predict height based on age and species, then height is a response. 🌲🌳🌴</p>
 <p>Problems and methods are conventionally described in terms of the type of response:</p>
@@ -818,6 +819,26 @@ Tip
 </section>
 <section id="sec-evaluating-models" class="level2" data-number="1.5">
 <h2 data-number="1.5" class="anchored" data-anchor-id="sec-evaluating-models"><span class="header-section-number">1.5</span> Evaluating Models</h2>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This section emphasizes ways to evaluate model <em>performance,</em> or how effectively a model makes predictions. Carefully thinking through the context, purpose, ethics, and fairness of a model is even more important, if less technical.</p>
+<p>A few useful references for thinking about model context and purpose are:</p>
+<ul>
+<li>UC Berkeley’s <a href="https://cdss.berkeley.edu/hce-toolkit">Human Contexts &amp; Ethics Toolkit</a></li>
+<li>DataLab’s <a href="https://ucdavisdatalab.github.io/responsible-data-science/">Responsible Data Science reader</a></li>
+<li>The Turing Way’s <a href="https://book.the-turing-way.org/ethical-research/ethical-research">Guide for Ethical Research</a></li>
+</ul>
+<p>Researchers have invented many different ways to quantify fairness. Arvind Narayanan (Professor of Computer Science, Princeton University) presented <a href="https://www.youtube.com/watch?v=jIXIuYdnyyk">a lecture that introduces 21 of these</a> and also co-authored <a href="https://fairmlbook.org/">a textbook about fairness in machine learning</a>.</p>
+</div>
+</div>
 <p>Perhaps the most informative classification model performance statistic is a <strong>confusion matrix</strong>, a cross-tabulation of actual and predicted classes. Unlike an accuracy estimate, a confusion matrix shows how well the model performs for each class. You can also use the confusion matrix to compute a variety of other statistics:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
